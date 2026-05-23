@@ -96,7 +96,6 @@ export default async function LoginPage({ searchParams }: Props) {
           <p className="mt-4 text-center text-xs text-zinc-600 flex items-center justify-center gap-1">
             <ShieldCheck className="w-4 h-4" /> Sécurisé par Supabase Auth
           </p>
-        </div>
       </div>
     </div>
   );
