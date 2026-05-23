@@ -40,6 +40,11 @@ export default async function CarsPage(props: Props) {
     query = query.in("fuel", dbFuels);
   }
 
+  if (searchParams.maxPrice) {
+    const maxPrice = parseFloat(searchParams.maxPrice as string);
+    query = query.lte("price_day", maxPrice);
+  }
+
   const { data: dbCars } = await query.order("rating_average", { ascending: false });
 
   let cars = dbCars && dbCars.length > 0 ? dbCars : MOCK_CARS;
@@ -48,6 +53,11 @@ export default async function CarsPage(props: Props) {
     const fuels = Array.isArray(searchParams.fuel) ? searchParams.fuel : [searchParams.fuel];
     const dbFuels = fuels.map(f => f.toLowerCase());
     cars = MOCK_CARS.filter(c => dbFuels.includes(c.fuel.toLowerCase()));
+  }
+
+  if (searchParams.maxPrice && (!dbCars || dbCars.length === 0)) {
+    const maxPrice = parseFloat(searchParams.maxPrice as string);
+    cars = cars.filter(c => c.price_day <= maxPrice);
   }
 
   return (
