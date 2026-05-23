@@ -1,20 +1,22 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Calendar, Search, Star, ShieldCheck } from "lucide-react";
+import { MapPin, Calendar, Search, Star, ShieldCheck, CarFront, UserRound, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { createClient } from "@/lib/server";
 
-const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=2070&auto=format&fit=crop";
+const PLACEHOLDER_CAR = "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=2070&auto=format&fit=crop";
 
 const MOCK_FEATURED = [
-  { id: "1", brand: "BMW", model: "Série 5 M-Sport", transmission: "automatique", fuel: "essence", price_day: 85000, rating_average: 4.9, car_images: [] },
-  { id: "2", brand: "Range Rover", model: "Sport", transmission: "automatique", fuel: "essence", price_day: 120000, rating_average: 4.8, car_images: [] },
-  { id: "3", brand: "Mercedes", model: "Classe S", transmission: "automatique", fuel: "essence", price_day: 150000, rating_average: 5.0, car_images: [] },
+  { id: "1", brand: "BMW", model: "Série 5 M-Sport", fuel: "essence", transmission: "automatique", price_day: 85000, rating_average: 4.9, car_images: [] },
+  { id: "2", brand: "Range Rover", model: "Sport", fuel: "diesel", transmission: "automatique", price_day: 120000, rating_average: 4.8, car_images: [] },
+  { id: "3", brand: "Mercedes", model: "Classe S", fuel: "essence", transmission: "automatique", price_day: 150000, rating_average: 5.0, car_images: [] },
 ];
 
 export default async function Home() {
   const supabase = await createClient();
+
+  // Fetch 3 top-rated cars
   const { data: dbCars } = await supabase
     .from("cars")
     .select("*, car_images(*)")
@@ -22,7 +24,19 @@ export default async function Home() {
     .order("rating_average", { ascending: false })
     .limit(3);
 
-  const featured = dbCars && dbCars.length > 0 ? dbCars : MOCK_FEATURED;
+  const featuredCars = dbCars && dbCars.length > 0 ? dbCars : MOCK_FEATURED;
+
+  // Fetch platform stats
+  const [{ count: totalCars }, { count: totalDrivers }] = await Promise.all([
+    supabase.from("cars").select("*", { count: "exact", head: true }),
+    supabase.from("drivers").select("*", { count: "exact", head: true }).eq("is_verified", true),
+  ]);
+
+  const stats = [
+    { label: "Véhicules", value: totalCars ?? "500+", icon: CarFront },
+    { label: "Chauffeurs vérifiés", value: totalDrivers ?? "200+", icon: UserRound },
+    { label: "Villes couvertes", value: "12", icon: MapPin },
+  ];
 
   return (
     <div className="flex flex-col min-h-screen bg-black text-zinc-50 font-sans pb-24 md:pb-0">
@@ -73,8 +87,8 @@ export default async function Home() {
               </div>
             </div>
 
-            <Link href="/cars">
-              <Button size="lg" className="w-full md:w-auto h-14 px-8 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-lg shadow-lg shadow-blue-600/20 m-1">
+            <Link href="/cars" className="w-full md:w-auto m-1">
+              <Button size="lg" className="w-full h-14 px-8 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-lg shadow-lg shadow-blue-600/20">
                 <Search className="w-5 h-5 mr-2" />
                 Rechercher
               </Button>
@@ -83,20 +97,45 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Featured Vehicles Section */}
-      <section className="container mx-auto px-4 py-20">
+      {/* Stats Bar */}
+      <section className="border-y border-zinc-800 bg-zinc-950/80 backdrop-blur-xl py-6">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="grid grid-cols-3 gap-4">
+            {stats.map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <div key={stat.label} className="flex flex-col sm:flex-row items-center justify-center gap-3 text-center sm:text-left">
+                  <div className="w-10 h-10 rounded-full bg-blue-600/10 border border-blue-500/20 flex items-center justify-center shrink-0">
+                    <Icon className="w-5 h-5 text-blue-500" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-extrabold text-white">{stat.value}</p>
+                    <p className="text-xs text-zinc-500">{stat.label}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Cars Section */}
+      <section className="container mx-auto px-4 py-20 max-w-7xl">
         <div className="flex items-center justify-between mb-10">
-          <h2 className="text-3xl font-bold">Véhicules Populaires</h2>
+          <div>
+            <h2 className="text-3xl font-bold">Véhicules Populaires</h2>
+            <p className="text-zinc-500 mt-1">Les meilleures voitures sélectionnées pour vous</p>
+          </div>
           <Link href="/cars">
-            <Button variant="link" className="text-blue-400 hover:text-blue-300">
-              Voir tout &rarr;
+            <Button variant="outline" className="border-zinc-800 text-zinc-300 hover:text-white rounded-full hidden md:flex">
+              Voir tout <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featured.map((car) => {
-            const primaryImg = (car as any).car_images?.find((img: any) => img.is_primary)?.image_url || PLACEHOLDER_IMG;
+          {featuredCars.map((car) => {
+            const primaryImg = (car as any).car_images?.find((img: any) => img.is_primary)?.image_url || PLACEHOLDER_CAR;
             const name = `${(car as any).brand} ${(car as any).model}`;
             const price = Math.round((car as any).price_day / 1000);
             const rating = (car as any).rating_average || 0;
@@ -136,18 +175,26 @@ export default async function Home() {
             );
           })}
         </div>
+
+        <div className="mt-8 text-center md:hidden">
+          <Link href="/cars">
+            <Button variant="outline" className="border-zinc-800 text-zinc-300 hover:text-white rounded-full">
+              Voir tous les véhicules <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
+        </div>
       </section>
 
-      {/* CTA Section — Drivers */}
-      <section className="container mx-auto px-4 pb-20">
-        <div className="glass-card rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 border-zinc-800/50">
+      {/* Drivers CTA Section */}
+      <section className="container mx-auto px-4 pb-20 max-w-7xl">
+        <div className="glass-card rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 border-zinc-800/50 bg-gradient-to-r from-blue-950/30 to-indigo-950/20">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold mb-2">Besoin d&apos;un chauffeur ?</h2>
-            <p className="text-zinc-400">Des professionnels vérifiés disponibles 24h/24 à Dakar et dans tout le Sénégal.</p>
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">Besoin d&apos;un chauffeur privé ?</h2>
+            <p className="text-zinc-400 max-w-lg">Réservez un chauffeur professionnel certifié, disponible 24h/24 dans toutes les grandes villes du Sénégal.</p>
           </div>
-          <Link href="/drivers">
-            <Button size="lg" className="rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold px-10 shadow-lg shadow-blue-600/20 shrink-0">
-              Voir les chauffeurs
+          <Link href="/drivers" className="shrink-0">
+            <Button className="h-12 px-8 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-600/20">
+              <UserRound className="w-5 h-5 mr-2" /> Trouver un chauffeur
             </Button>
           </Link>
         </div>
