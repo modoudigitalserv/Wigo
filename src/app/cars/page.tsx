@@ -52,7 +52,12 @@ export default async function CarsPage() {
             <div className="space-y-2">
               {["Essence", "Diesel", "Électrique", "Hybride"].map(cat => (
                 <label key={cat} className="flex items-center gap-3 cursor-pointer group">
-                  <div className="w-5 h-5 rounded border border-zinc-700 bg-zinc-900 group-hover:border-blue-500 transition-colors flex items-center justify-center"></div>
+                  <input type="checkbox" className="peer sr-only" />
+                  <div className="w-5 h-5 rounded border border-zinc-700 bg-zinc-900 group-hover:border-blue-500 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition-colors flex items-center justify-center [&>svg]:hidden peer-checked:[&>svg]:block">
+                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
                   <span className="text-zinc-300 group-hover:text-white transition-colors">{cat}</span>
                 </label>
               ))}
