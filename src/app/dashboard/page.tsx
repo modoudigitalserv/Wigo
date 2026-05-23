@@ -1,64 +1,153 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CarFront, Calendar, Wallet, TrendingUp, Bell, Settings, LogOut, ChevronRight } from "lucide-react";
-import Image from "next/image";
+import { CarFront, Calendar, Wallet, TrendingUp, Bell, Settings, ChevronRight, UserRound, Star } from "lucide-react";
 import Link from "next/link";
+import { createClient } from "@/lib/server";
+import { redirect } from "next/navigation";
+import { signout } from "@/app/login/actions";
 
-export default function DashboardPage() {
+const STATUS_STYLES: Record<string, string> = {
+  confirmed: "text-green-400 bg-green-400/10 border-green-400/20",
+  pending:   "text-yellow-400 bg-yellow-400/10 border-yellow-400/20",
+  completed: "text-blue-400 bg-blue-400/10 border-blue-400/20",
+  cancelled: "text-red-400 bg-red-400/10 border-red-400/20",
+  active:    "text-purple-400 bg-purple-400/10 border-purple-400/20",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  confirmed: "Confirmé",
+  pending: "En attente",
+  completed: "Terminé",
+  cancelled: "Annulé",
+  active: "En cours",
+  rejected: "Refusé",
+};
+
+export default async function DashboardPage() {
+  const supabase = await createClient();
+
+  // Auth guard
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims;
+  if (!user) redirect("/login");
+
+  // Fetch profile
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.sub)
+    .single();
+
+  const displayName = profile?.full_name || user.email || "Utilisateur";
+  const initials = displayName.slice(0, 2).toUpperCase();
+  const role = profile?.role || "client";
+
+  // Fetch bookings (cars) for this user
+  const { data: bookings } = await supabase
+    .from("bookings")
+    .select("*, cars(brand, model)")
+    .eq("customer_id", user.sub)
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  // Fetch driver bookings if driver
+  const { data: driverBookings } = role === "driver"
+    ? await supabase
+        .from("driver_bookings")
+        .select("*")
+        .eq("customer_id", user.sub)
+        .order("created_at", { ascending: false })
+        .limit(5)
+    : { data: null };
+
+  // Fetch company data if company
+  const { data: company } = role === "company"
+    ? await supabase
+        .from("companies")
+        .select("*, cars(count)")
+        .eq("user_id", user.sub)
+        .single()
+    : { data: null };
+
+  // Stats
+  const totalBookings = bookings?.length || 0;
+  const activeBookings = bookings?.filter(b => ["confirmed", "active", "pending"].includes(b.status)).length || 0;
+  const totalSpent = bookings?.reduce((sum, b) => sum + (b.total_price || 0), 0) || 0;
+
+  const navLinks = [
+    { href: "/dashboard", label: "Vue d'ensemble", icon: TrendingUp, active: true },
+    { href: "/dashboard/bookings", label: "Réservations", icon: Calendar },
+    ...(role === "company" ? [{ href: "/dashboard/cars", label: "Mes Véhicules", icon: CarFront }] : []),
+    ...(role === "driver" ? [{ href: "/dashboard/missions", label: "Mes Missions", icon: CarFront }] : []),
+    { href: "/dashboard/revenues", label: "Revenus", icon: Wallet },
+    { href: "/dashboard/settings", label: "Paramètres", icon: Settings },
+  ];
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-black text-zinc-50 font-sans pt-16">
-      {/* Sidebar Dashboard */}
-      <aside className="w-full md:w-64 border-r border-zinc-800 bg-zinc-950/50 hidden md:block">
-        <div className="p-6">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
-              MG
+      {/* Sidebar */}
+      <aside className="w-full md:w-64 border-r border-zinc-800 bg-zinc-950/50 hidden md:flex md:flex-col">
+        <div className="p-6 flex-1">
+          {/* User Info */}
+          <div className="flex items-center gap-3 mb-8 p-3 rounded-xl bg-zinc-900/50 border border-zinc-800/50">
+            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+              {initials}
             </div>
-            <div>
-              <p className="font-bold text-sm">Modou Gueye</p>
-              <p className="text-xs text-zinc-500">Plan Pro</p>
+            <div className="min-w-0">
+              <p className="font-bold text-sm truncate">{displayName}</p>
+              <p className="text-xs text-blue-400 capitalize">{role}</p>
             </div>
           </div>
-          
-          <nav className="space-y-2">
-            <Link href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-600/10 text-blue-500 font-medium">
-              <TrendingUp className="w-4 h-4" /> Vue d'ensemble
-            </Link>
-            <Link href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors">
-              <Calendar className="w-4 h-4" /> Réservations
-            </Link>
-            <Link href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors">
-              <CarFront className="w-4 h-4" /> Mes Véhicules
-            </Link>
-            <Link href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors">
-              <Wallet className="w-4 h-4" /> Revenus
-            </Link>
-            <Link href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors">
-              <Settings className="w-4 h-4" /> Paramètres
-            </Link>
+
+          <nav className="space-y-1">
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-colors ${
+                    link.active
+                      ? "bg-blue-600/10 text-blue-400 border border-blue-500/20"
+                      : "text-zinc-400 hover:text-white hover:bg-zinc-900"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" /> {link.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
-        <div className="absolute bottom-4 w-64 px-6">
-          <Button variant="ghost" className="w-full justify-start text-zinc-500 hover:text-red-400 hover:bg-red-500/10">
-            <LogOut className="w-4 h-4 mr-2" /> Déconnexion
-          </Button>
+
+        {/* Sign out */}
+        <div className="p-6 border-t border-zinc-800">
+          <form action={signout}>
+            <Button type="submit" variant="ghost" className="w-full justify-start text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl">
+              Se déconnecter
+            </Button>
+          </form>
         </div>
       </aside>
 
-      {/* Main Content Dashboard */}
+      {/* Main Content */}
       <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-24 md:pb-8">
+        {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Vue d'ensemble</h1>
-            <p className="text-zinc-400 text-sm">Bienvenue sur votre espace de gestion.</p>
+            <h1 className="text-2xl font-bold">Bonjour, {displayName.split(" ")[0]} 👋</h1>
+            <p className="text-zinc-400 text-sm mt-1">Voici un aperçu de votre activité.</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="icon" className="border-zinc-800 text-zinc-400 rounded-full">
               <Bell className="w-4 h-4" />
             </Button>
-            <Button className="bg-blue-600 hover:bg-blue-500 text-white rounded-full">
-              + Ajouter un véhicule
-            </Button>
+            {role === "company" && (
+              <Link href="/dashboard/cars/new">
+                <Button className="bg-blue-600 hover:bg-blue-500 text-white rounded-full">
+                  + Ajouter un véhicule
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
 
@@ -66,81 +155,102 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="glass-card border-zinc-800/50">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-zinc-400">Revenus Mensuels</CardTitle>
+              <CardTitle className="text-sm font-medium text-zinc-400">Total dépensé</CardTitle>
               <Wallet className="w-4 h-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">1 450 000 <span className="text-sm font-normal text-zinc-500">FCFA</span></div>
-              <p className="text-xs text-green-500 mt-1 flex items-center">+12.5% depuis le mois dernier</p>
+              <div className="text-3xl font-bold">
+                {totalSpent > 0 ? `${Math.round(totalSpent / 1000)}K` : "—"}
+                <span className="text-sm font-normal text-zinc-500 ml-1">FCFA</span>
+              </div>
+              <p className="text-xs text-zinc-500 mt-1">Total de vos réservations</p>
             </CardContent>
           </Card>
+
           <Card className="glass-card border-zinc-800/50">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-zinc-400">Réservations Actives</CardTitle>
               <Calendar className="w-4 h-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">8</div>
-              <p className="text-xs text-zinc-500 mt-1 flex items-center">3 en attente de validation</p>
+              <div className="text-3xl font-bold">{activeBookings}</div>
+              <p className="text-xs text-zinc-500 mt-1">{totalBookings} réservation{totalBookings > 1 ? "s" : ""} au total</p>
             </CardContent>
           </Card>
+
           <Card className="glass-card border-zinc-800/50">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-zinc-400">Taux d'occupation</CardTitle>
-              <TrendingUp className="w-4 h-4 text-blue-500" />
+              <CardTitle className="text-sm font-medium text-zinc-400">Mon Profil</CardTitle>
+              <UserRound className="w-4 h-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">78%</div>
-              <div className="w-full bg-zinc-800 rounded-full h-1.5 mt-2">
-                <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: '78%' }}></div>
-              </div>
+              <div className="text-xl font-bold capitalize text-blue-400">{role}</div>
+              <p className="text-xs text-zinc-500 mt-1">{user.email}</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Recent Bookings Table */}
-        <h2 className="text-lg font-bold mb-4">Réservations Récentes</h2>
+        {/* Bookings Table */}
+        <h2 className="text-lg font-bold mb-4">Mes Réservations Récentes</h2>
         <Card className="glass-card border-zinc-800/50 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="text-xs text-zinc-400 uppercase bg-zinc-900/50 border-b border-zinc-800">
-                <tr>
-                  <th className="px-6 py-4 font-medium">Véhicule</th>
-                  <th className="px-6 py-4 font-medium">Client</th>
-                  <th className="px-6 py-4 font-medium">Dates</th>
-                  <th className="px-6 py-4 font-medium">Montant</th>
-                  <th className="px-6 py-4 font-medium">Statut</th>
-                  <th className="px-6 py-4"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800/50">
-                {[
-                  { car: "BMW Série 5", client: "Amadou D.", dates: "12 - 15 Mai", price: "255K", status: "Confirmé", color: "text-green-400 bg-green-400/10 border-green-400/20" },
-                  { car: "Range Rover", client: "Fatou N.", dates: "18 - 20 Mai", price: "240K", status: "En attente", color: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20" },
-                  { car: "Mercedes S", client: "Omar B.", dates: "01 - 05 Juin", price: "750K", status: "Payé", color: "text-blue-400 bg-blue-400/10 border-blue-400/20" }
-                ].map((row, i) => (
-                  <tr key={i} className="hover:bg-zinc-900/30 transition-colors">
-                    <td className="px-6 py-4 font-medium text-white">{row.car}</td>
-                    <td className="px-6 py-4 text-zinc-300">{row.client}</td>
-                    <td className="px-6 py-4 text-zinc-400">{row.dates}</td>
-                    <td className="px-6 py-4 font-bold">{row.price}</td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${row.color}`}>
-                        {row.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white">
-                        <ChevronRight className="w-4 h-4" />
-                      </Button>
-                    </td>
+          {bookings && bookings.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="text-xs text-zinc-400 uppercase bg-zinc-900/50 border-b border-zinc-800">
+                  <tr>
+                    <th className="px-6 py-4 font-medium">Véhicule</th>
+                    <th className="px-6 py-4 font-medium">Dates</th>
+                    <th className="px-6 py-4 font-medium">Montant</th>
+                    <th className="px-6 py-4 font-medium">Statut</th>
+                    <th className="px-6 py-4"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/50">
+                  {bookings.map((booking) => {
+                    const car = (booking as any).cars;
+                    const carName = car ? `${car.brand} ${car.model}` : "Véhicule";
+                    const start = new Date(booking.start_date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+                    const end = new Date(booking.end_date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+                    const price = Math.round(booking.total_price / 1000);
+                    const statusStyle = STATUS_STYLES[booking.status] || "text-zinc-400 bg-zinc-400/10 border-zinc-400/20";
+                    const statusLabel = STATUS_LABELS[booking.status] || booking.status;
+
+                    return (
+                      <tr key={booking.id} className="hover:bg-zinc-900/30 transition-colors">
+                        <td className="px-6 py-4 font-medium text-white">{carName}</td>
+                        <td className="px-6 py-4 text-zinc-400">{start} – {end}</td>
+                        <td className="px-6 py-4 font-bold">{price}K FCFA</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${statusStyle}`}>
+                            {statusLabel}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white">
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <Calendar className="w-12 h-12 text-zinc-700 mb-4" />
+              <h3 className="text-lg font-semibold text-zinc-400 mb-2">Aucune réservation</h3>
+              <p className="text-zinc-600 text-sm mb-6">Vous n&apos;avez pas encore effectué de réservation.</p>
+              <Link href="/cars">
+                <Button className="bg-blue-600 hover:bg-blue-500 rounded-full">
+                  Explorer les véhicules
+                </Button>
+              </Link>
+            </div>
+          )}
         </Card>
       </main>
     </div>
   );
 }
+
