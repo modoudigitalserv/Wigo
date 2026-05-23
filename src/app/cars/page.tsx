@@ -17,62 +17,42 @@ const MOCK_CARS = [
   { id: "6", brand: "Tesla", model: "Model S Plaid", fuel: "electrique", transmission: "automatique", price_day: 200, rating_average: 4.7, city: "Casablanca", car_images: [] },
 ];
 
-export default async function CarsPage() {
+import CarFilters from "./CarFilters";
+
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function CarsPage(props: Props) {
+  const searchParams = await props.searchParams;
   // Fetch from Supabase, fallback to mock data if empty
   const supabase = await createClient();
-  const { data: dbCars } = await supabase
+  let query = supabase
     .from("cars")
     .select("*, car_images(*)")
-    .eq("status", "disponible")
-    .order("rating_average", { ascending: false });
+    .eq("status", "disponible");
 
-  const cars = dbCars && dbCars.length > 0 ? dbCars : MOCK_CARS;
+  if (searchParams.fuel) {
+    const fuels = Array.isArray(searchParams.fuel) ? searchParams.fuel : [searchParams.fuel];
+    const dbFuels = fuels.map(f => f.toLowerCase());
+    query = query.in("fuel", dbFuels);
+  }
+
+  const { data: dbCars } = await query.order("rating_average", { ascending: false });
+
+  let cars = dbCars && dbCars.length > 0 ? dbCars : MOCK_CARS;
+
+  if (searchParams.fuel && (!dbCars || dbCars.length === 0)) {
+    const fuels = Array.isArray(searchParams.fuel) ? searchParams.fuel : [searchParams.fuel];
+    const dbFuels = fuels.map(f => f.toLowerCase());
+    cars = MOCK_CARS.filter(c => dbFuels.includes(c.fuel.toLowerCase()));
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-black text-zinc-50 font-sans pb-24 md:pb-0 pt-6">
       <div className="container mx-auto px-4 max-w-7xl flex flex-col md:flex-row gap-8">
         
-        {/* Sidebar Filters */}
-        <aside className="w-full md:w-64 shrink-0 space-y-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Filter className="w-5 h-5 text-blue-500" />
-            <h2 className="text-xl font-bold">Filtres</h2>
-          </div>
-          
-          <div className="space-y-3">
-            <h3 className="font-medium text-zinc-400 uppercase text-xs tracking-wider">Recherche</h3>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-              <Input placeholder="Modèle, marque..." className="pl-9 bg-zinc-900 border-zinc-800 text-white placeholder-zinc-500 rounded-xl" />
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="font-medium text-zinc-400 uppercase text-xs tracking-wider">Carburant</h3>
-            <div className="space-y-2">
-              {["Essence", "Diesel", "Électrique", "Hybride"].map(cat => (
-                <label key={cat} className="flex items-center gap-3 cursor-pointer group">
-                  <input type="checkbox" className="peer sr-only" />
-                  <div className="w-5 h-5 rounded border border-zinc-700 bg-zinc-900 group-hover:border-blue-500 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition-colors flex items-center justify-center [&>svg]:hidden peer-checked:[&>svg]:block">
-                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-zinc-300 group-hover:text-white transition-colors">{cat}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="font-medium text-zinc-400 uppercase text-xs tracking-wider">Prix Max (€/Jour)</h3>
-            <Input type="range" className="w-full accent-blue-500" />
-            <div className="flex justify-between text-xs text-zinc-500">
-              <span>0</span>
-              <span>300K+</span>
-            </div>
-          </div>
-        </aside>
+        <CarFilters />
 
         {/* Main Content */}
         <main className="flex-1">
