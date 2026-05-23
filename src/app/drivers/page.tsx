@@ -12,6 +12,9 @@ const MOCK_DRIVERS = [
   { id: "2", full_name: "Cheikh T.", experience_years: 12, rating_average: 5.0, total_missions: 890, daily_rate: 20000, languages: ["FR", "EN"], photo_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop", is_verified: true },
   { id: "3", full_name: "Ibrahima S.", experience_years: 5, rating_average: 4.8, total_missions: 156, daily_rate: 12000, languages: ["FR", "WO"], photo_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop", is_verified: true },
   { id: "4", full_name: "Abdoulaye D.", experience_years: 15, rating_average: 5.0, total_missions: 1205, daily_rate: 25000, languages: ["FR", "EN", "AR"], photo_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop", is_verified: true },
+  { id: "5", full_name: "Jean D.", experience_years: 4, rating_average: 4.5, total_missions: 80, daily_rate: 14000, languages: ["FR"], photo_url: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=1974&auto=format&fit=crop", is_verified: true },
+  { id: "6", full_name: "John S.", experience_years: 6, rating_average: 4.7, total_missions: 120, daily_rate: 18000, languages: ["EN"], photo_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop", is_verified: true },
+  { id: "7", full_name: "Youssef B.", experience_years: 10, rating_average: 4.9, total_missions: 450, daily_rate: 16000, languages: ["AR"], photo_url: "https://images.unsplash.com/photo-1566492031523-87d28ebd9cb0?q=80&w=1974&auto=format&fit=crop", is_verified: true },
 ];
 
 import DriverFilters from "./DriverFilters";
