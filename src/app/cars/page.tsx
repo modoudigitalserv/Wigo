@@ -15,6 +15,8 @@ const MOCK_CARS = [
   { id: "4", brand: "Audi", model: "RS6 Avant", fuel: "essence", transmission: "automatique", price_day: 170, rating_average: 4.9, city: "Casablanca", car_images: [] },
   { id: "5", brand: "Porsche", model: "911 Carrera", fuel: "essence", transmission: "automatique", price_day: 300, rating_average: 5.0, city: "Casablanca", car_images: [] },
   { id: "6", brand: "Tesla", model: "Model S Plaid", fuel: "electrique", transmission: "automatique", price_day: 200, rating_average: 4.7, city: "Casablanca", car_images: [] },
+  { id: "7", brand: "BMW", model: "X5 xDrive40d", fuel: "diesel", transmission: "automatique", price_day: 150, rating_average: 4.6, city: "Marrakech", car_images: [] },
+  { id: "8", brand: "Tesla", model: "Model 3", fuel: "electrique", transmission: "automatique", price_day: 120, rating_average: 4.8, city: "Rabat", car_images: [] },
 ];
 
 import CarFilters from "./CarFilters";
