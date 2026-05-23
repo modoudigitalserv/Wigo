@@ -14,7 +14,7 @@ export default async function RegisterPage({ searchParams }: Props) {
   const params = await searchParams;
 
   return (
-    <div className="min-h-screen bg-black flex relative overflow-hidden">
+    <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden px-4">
       {/* Background */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -24,19 +24,20 @@ export default async function RegisterPage({ searchParams }: Props) {
           className="object-cover opacity-30"
           unoptimized
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-transparent md:w-1/2" />
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       </div>
 
-      <div className="relative z-10 w-full md:w-1/2 flex flex-col justify-center p-8 md:p-16 lg:p-20 overflow-y-auto">
-        <div className="max-w-md w-full mx-auto">
-          <Link href="/" className="inline-block mb-8">
-            <span className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-indigo-600 bg-clip-text text-transparent">
+      <div className="relative z-10 w-full max-w-md py-12">
+        <div className="text-center mb-8">
+          <Link href="/">
+            <span className="text-4xl font-extrabold bg-gradient-to-r from-blue-400 to-indigo-600 bg-clip-text text-transparent">
               Wigo
             </span>
           </Link>
 
-          <h1 className="text-4xl font-bold text-white mb-2">Créer un compte</h1>
-          <p className="text-zinc-400 mb-8">Rejoignez la plateforme n°1 de mobilité au Sénégal.</p>
+          <h1 className="text-3xl font-bold text-white mt-4 mb-2">Créer un compte</h1>
+          <p className="text-zinc-400">Rejoignez la plateforme n°1 de mobilité au Sénégal.</p>
+        </div>
 
           {params.error && (
             <div className="mb-6 flex items-center gap-3 p-4 rounded-xl bg-red-950/50 border border-red-800/50 text-red-400">
@@ -121,8 +122,8 @@ export default async function RegisterPage({ searchParams }: Props) {
           <p className="mt-4 text-center text-xs text-zinc-600 flex items-center justify-center gap-1">
             <ShieldCheck className="w-4 h-4" /> Sécurisé par Supabase Auth
           </p>
-        </div>
       </div>
     </div>
   );
 }
+
