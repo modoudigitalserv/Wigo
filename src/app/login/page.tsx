@@ -14,29 +14,29 @@ export default async function LoginPage({ searchParams }: Props) {
   const params = await searchParams;
 
   return (
-    <div className="min-h-screen bg-black flex relative overflow-hidden">
+    <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden px-4">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
           src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=2070&auto=format&fit=crop"
           alt="Luxury Car Interior"
           fill
-          className="object-cover opacity-40"
+          className="object-cover opacity-30"
           unoptimized
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent md:w-1/2" />
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       </div>
 
-      <div className="relative z-10 w-full md:w-1/2 flex flex-col justify-center p-8 md:p-16 lg:p-24">
-        <div className="max-w-md w-full mx-auto">
-          <Link href="/" className="inline-block mb-10">
-            <span className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-indigo-600 bg-clip-text text-transparent">
+      <div className="relative z-10 w-full max-w-md">
+        <div className="text-center mb-8">
+          <Link href="/">
+            <span className="text-4xl font-extrabold bg-gradient-to-r from-blue-400 to-indigo-600 bg-clip-text text-transparent">
               Wigo
             </span>
           </Link>
-          
-          <h1 className="text-4xl font-bold text-white mb-2">Bienvenue</h1>
-          <p className="text-zinc-400 mb-8">Connectez-vous pour gérer vos réservations ou vos missions.</p>
+          <h1 className="text-3xl font-bold text-white mt-4 mb-2">Bienvenue</h1>
+          <p className="text-zinc-400">Connectez-vous pour gérer vos réservations.</p>
+        </div>
 
           {/* Alerts */}
           {params.error && (
@@ -101,4 +101,3 @@ export default async function LoginPage({ searchParams }: Props) {
     </div>
   );
 }
-
