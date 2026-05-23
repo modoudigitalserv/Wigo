@@ -108,11 +108,9 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
                   </div>
                 </div>
 
-                <Link href={`/cars/${params.id}/book`} className="block">
-                  <Button className="w-full h-14 text-lg font-bold rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20 mb-4">
-                    Réserver ce véhicule
-                  </Button>
-                </Link>
+                <Button className="w-full h-14 text-lg font-bold rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20 mb-4">
+                  Réserver ce véhicule
+                </Button>
                 
                 <p className="text-center text-xs text-zinc-500 flex items-center justify-center gap-1">
                   <ShieldCheck className="w-4 h-4" /> Aucun montant débité avant confirmation
