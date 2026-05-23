@@ -431,3 +431,24 @@ grant all on public.driver_bookings to authenticated;
 grant all on public.reviews to authenticated;
 grant all on public.driver_reviews to authenticated;
 grant all on public.driver_documents to authenticated;
+
+-- ============================================================
+-- 13. STORAGE BUCKETS (Photos de véhicules)
+-- ============================================================
+insert into storage.buckets (id, name, public) 
+values ('cars', 'cars', true)
+on conflict (id) do nothing;
+
+create policy "Les images des voitures sont publiques"
+  on storage.objects for select
+  using ( bucket_id = 'cars' );
+
+create policy "Les utilisateurs authentifiés peuvent uploader des images"
+  on storage.objects for insert
+  to authenticated
+  with check ( bucket_id = 'cars' );
+
+create policy "Les utilisateurs authentifiés peuvent supprimer leurs images"
+  on storage.objects for delete
+  to authenticated
+  using ( bucket_id = 'cars' );
