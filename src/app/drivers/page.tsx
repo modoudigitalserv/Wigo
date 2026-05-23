@@ -47,7 +47,7 @@ export default async function DriversPage() {
           <div className="space-y-3">
             <h3 className="font-medium text-zinc-400 uppercase text-xs tracking-wider">Langues parlées</h3>
             <div className="space-y-2">
-              {["Français", "Anglais", "Arabe", "Wolof"].map(lang => (
+              {["Français", "Anglais", "Darija"].map(lang => (
                 <label key={lang} className="flex items-center gap-3 cursor-pointer group">
                   <div className="w-5 h-5 rounded border border-zinc-700 bg-zinc-900 group-hover:border-blue-500 transition-colors flex items-center justify-center"></div>
                   <span className="text-zinc-300 group-hover:text-white transition-colors">{lang}</span>
