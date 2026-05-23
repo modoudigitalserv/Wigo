@@ -55,7 +55,7 @@ export default function NewCarPage() {
               
               <div className="space-y-2">
                 <Label htmlFor="city" className="text-zinc-300">Ville <span className="text-red-500">*</span></Label>
-                <Input id="city" name="city" placeholder="Ex: Dakar" required className="bg-zinc-900 border-zinc-700 text-white focus-visible:ring-blue-500 h-12 rounded-xl" />
+                <Input id="city" name="city" placeholder="Ex: Casablanca" required className="bg-zinc-900 border-zinc-700 text-white focus-visible:ring-blue-500 h-12 rounded-xl" />
               </div>
 
             </CardContent>
@@ -94,8 +94,8 @@ export default function NewCarPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price_day" className="text-zinc-300">Prix par jour (FCFA) <span className="text-red-500">*</span></Label>
-                <Input id="price_day" name="price_day" type="number" min="0" placeholder="Ex: 50000" required className="bg-zinc-900 border-zinc-700 text-white focus-visible:ring-blue-500 h-12 rounded-xl" />
+                <Label htmlFor="price_day" className="text-zinc-300">Prix par jour (€) <span className="text-red-500">*</span></Label>
+                <Input id="price_day" name="price_day" type="number" min="0" placeholder="Ex: 80" required className="bg-zinc-900 border-zinc-700 text-white focus-visible:ring-blue-500 h-12 rounded-xl" />
               </div>
 
               <div className="space-y-2 md:col-span-2">

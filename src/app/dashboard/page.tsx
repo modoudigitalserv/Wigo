@@ -161,7 +161,7 @@ export default async function DashboardPage() {
             <CardContent>
               <div className="text-3xl font-bold">
                 {totalSpent > 0 ? `${Math.round(totalSpent / 1000)}K` : "—"}
-                <span className="text-sm font-normal text-zinc-500 ml-1">FCFA</span>
+                <span className="text-sm font-normal text-zinc-500 ml-1">€</span>
               </div>
               <p className="text-xs text-zinc-500 mt-1">Total de vos réservations</p>
             </CardContent>
@@ -219,7 +219,7 @@ export default async function DashboardPage() {
                       <tr key={booking.id} className="hover:bg-zinc-900/30 transition-colors">
                         <td className="px-6 py-4 font-medium text-white">{carName}</td>
                         <td className="px-6 py-4 text-zinc-400">{start} – {end}</td>
-                        <td className="px-6 py-4 font-bold">{price}K FCFA</td>
+                        <td className="px-6 py-4 font-bold">{price} €</td>
                         <td className="px-6 py-4">
                           <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${statusStyle}`}>
                             {statusLabel}

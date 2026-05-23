@@ -45,7 +45,7 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
               </div>
               <h1 className="text-4xl md:text-5xl font-extrabold mb-4">BMW Série 5 M-Sport</h1>
               <p className="text-zinc-400 text-lg flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-blue-500" /> Dakar, Almadies
+                <MapPin className="w-5 h-5 text-blue-500" /> Casablanca, Maarif
               </p>
             </div>
 
@@ -71,7 +71,7 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
               <p className="text-zinc-400 leading-relaxed">
                 Louez cette magnifique BMW Série 5 M-Sport pour vos déplacements professionnels ou vos week-ends. 
                 Alliant confort absolu, sportivité et technologies de pointe, elle vous garantit une expérience 
-                de conduite inoubliable au Sénégal. Entretien régulier et propreté impeccable garantis.
+                de conduite inoubliable au Maroc. Entretien régulier et propreté impeccable garantis.
               </p>
             </div>
           </div>
@@ -81,7 +81,7 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
             <div className="sticky top-24">
               <Card className="glass-card border-zinc-800 p-6">
                 <div className="mb-6">
-                  <p className="text-3xl font-extrabold text-white">85 000 <span className="text-lg font-normal text-zinc-400">FCFA / jour</span></p>
+                  <p className="text-3xl font-extrabold text-white">130 <span className="text-lg font-normal text-zinc-400">€ / jour</span></p>
                 </div>
                 
                 <div className="space-y-4 mb-6">
@@ -103,7 +103,7 @@ export default function CarDetailPage({ params }: { params: { id: string } }) {
                     </div>
                     <div className="text-right">
                       <p className="font-bold">+ 15 000</p>
-                      <p className="text-[10px] text-zinc-500">FCFA / jour</p>
+                      <p className="text-[10px] text-zinc-500">€ / jour</p>
                     </div>
                   </div>
                 </div>

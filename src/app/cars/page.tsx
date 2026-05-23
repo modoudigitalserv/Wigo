@@ -9,12 +9,12 @@ import { createClient } from "@/lib/server";
 const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=2070&auto=format&fit=crop";
 
 const MOCK_CARS = [
-  { id: "1", brand: "BMW", model: "Série 5 M-Sport", fuel: "essence", transmission: "automatique", price_day: 85000, rating_average: 4.9, city: "Dakar", car_images: [] },
-  { id: "2", brand: "Range Rover", model: "Sport", fuel: "essence", transmission: "automatique", price_day: 120000, rating_average: 4.8, city: "Dakar", car_images: [] },
-  { id: "3", brand: "Mercedes", model: "Classe S", fuel: "essence", transmission: "automatique", price_day: 150000, rating_average: 5.0, city: "Dakar", car_images: [] },
-  { id: "4", brand: "Audi", model: "RS6 Avant", fuel: "essence", transmission: "automatique", price_day: 110000, rating_average: 4.9, city: "Dakar", car_images: [] },
-  { id: "5", brand: "Porsche", model: "911 Carrera", fuel: "essence", transmission: "automatique", price_day: 200000, rating_average: 5.0, city: "Dakar", car_images: [] },
-  { id: "6", brand: "Tesla", model: "Model S Plaid", fuel: "electrique", transmission: "automatique", price_day: 130000, rating_average: 4.7, city: "Dakar", car_images: [] },
+  { id: "1", brand: "BMW", model: "Série 5 M-Sport", fuel: "essence", transmission: "automatique", price_day: 130, rating_average: 4.9, city: "Casablanca", car_images: [] },
+  { id: "2", brand: "Range Rover", model: "Sport", fuel: "essence", transmission: "automatique", price_day: 180, rating_average: 4.8, city: "Casablanca", car_images: [] },
+  { id: "3", brand: "Mercedes", model: "Classe S", fuel: "essence", transmission: "automatique", price_day: 230, rating_average: 5.0, city: "Casablanca", car_images: [] },
+  { id: "4", brand: "Audi", model: "RS6 Avant", fuel: "essence", transmission: "automatique", price_day: 170, rating_average: 4.9, city: "Casablanca", car_images: [] },
+  { id: "5", brand: "Porsche", model: "911 Carrera", fuel: "essence", transmission: "automatique", price_day: 300, rating_average: 5.0, city: "Casablanca", car_images: [] },
+  { id: "6", brand: "Tesla", model: "Model S Plaid", fuel: "electrique", transmission: "automatique", price_day: 200, rating_average: 4.7, city: "Casablanca", car_images: [] },
 ];
 
 export default async function CarsPage() {
@@ -60,7 +60,7 @@ export default async function CarsPage() {
           </div>
 
           <div className="space-y-3">
-            <h3 className="font-medium text-zinc-400 uppercase text-xs tracking-wider">Prix Max (FCFA/Jour)</h3>
+            <h3 className="font-medium text-zinc-400 uppercase text-xs tracking-wider">Prix Max (€/Jour)</h3>
             <Input type="range" className="w-full accent-blue-500" />
             <div className="flex justify-between text-xs text-zinc-500">
               <span>0</span>
@@ -116,7 +116,7 @@ export default async function CarsPage() {
                       <div className="mt-4 pt-4 border-t border-zinc-800 flex justify-between items-end">
                         <div className="text-left">
                           <p className="text-xl font-bold text-white">{price}K</p>
-                          <p className="text-xs text-zinc-500">FCFA / jour</p>
+                          <p className="text-xs text-zinc-500">€ / jour</p>
                         </div>
                         <Button size="sm" className="bg-white text-black hover:bg-zinc-200 rounded-full font-semibold">
                           Réserver

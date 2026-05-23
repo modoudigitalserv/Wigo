@@ -36,7 +36,7 @@ export default async function RegisterPage({ searchParams }: Props) {
           </Link>
 
           <h1 className="text-3xl font-bold text-white mt-4 mb-2">Créer un compte</h1>
-          <p className="text-zinc-400">Rejoignez la plateforme n°1 de mobilité au Sénégal.</p>
+          <p className="text-zinc-400">Rejoignez la plateforme n°1 de mobilité au Maroc.</p>
         </div>
 
           {params.error && (

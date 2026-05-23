@@ -103,7 +103,7 @@ export default async function DriversPage() {
                           </div>
                           <div className="text-right">
                             <p className="text-xl font-bold text-blue-400">{price}K</p>
-                            <p className="text-[10px] text-zinc-500 uppercase">FCFA / jour</p>
+                            <p className="text-[10px] text-zinc-500 uppercase">€ / jour</p>
                           </div>
                         </div>
 

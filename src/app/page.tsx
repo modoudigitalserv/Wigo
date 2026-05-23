@@ -57,7 +57,7 @@ export default async function Home() {
 
         <div className="relative z-10 container mx-auto px-4 text-center mt-16">
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-sm font-medium text-blue-400 mb-6 border-blue-500/20">
-            <ShieldCheck className="w-4 h-4" /> Plateforme n°1 au Sénégal
+            <ShieldCheck className="w-4 h-4" /> Plateforme n°1 au Maroc
           </span>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6">
             L&apos;Excellence <br />
@@ -75,7 +75,7 @@ export default async function Home() {
               <MapPin className="w-5 h-5 text-zinc-400" />
               <div className="text-left w-full">
                 <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Lieu</p>
-                <input type="text" placeholder="Dakar, Sénégal" className="bg-transparent border-none outline-none text-white w-full placeholder-zinc-600 font-medium" />
+                <input type="text" placeholder="Casablanca, Maroc" className="bg-transparent border-none outline-none text-white w-full placeholder-zinc-600 font-medium" />
               </div>
             </div>
             
@@ -166,7 +166,7 @@ export default async function Home() {
                       </div>
                       <div className="text-right">
                         <p className="text-2xl font-bold text-white">{price}K</p>
-                        <p className="text-xs text-zinc-500">FCFA / jour</p>
+                        <p className="text-xs text-zinc-500">€ / jour</p>
                       </div>
                     </div>
                   </CardContent>
@@ -190,7 +190,7 @@ export default async function Home() {
         <div className="glass-card rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 border-zinc-800/50 bg-gradient-to-r from-blue-950/30 to-indigo-950/20">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold mb-2">Besoin d&apos;un chauffeur privé ?</h2>
-            <p className="text-zinc-400 max-w-lg">Réservez un chauffeur professionnel certifié, disponible 24h/24 dans toutes les grandes villes du Sénégal.</p>
+            <p className="text-zinc-400 max-w-lg">Réservez un chauffeur professionnel certifié, disponible 24h/24 dans toutes les grandes villes du Maroc.</p>
           </div>
           <Link href="/drivers" className="shrink-0">
             <Button className="h-12 px-8 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-600/20">
