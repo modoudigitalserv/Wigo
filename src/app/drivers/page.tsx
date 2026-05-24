@@ -8,13 +8,13 @@ import { createClient } from "@/lib/server";
 const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1974&auto=format&fit=crop";
 
 const MOCK_DRIVERS = [
-  { id: "1", full_name: "Mamadou N.", experience_years: 8, rating_average: 4.9, total_missions: 342, daily_rate: 15000, languages: ["FR", "EN", "WO"], photo_url: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1974&auto=format&fit=crop", is_verified: true },
-  { id: "2", full_name: "Cheikh T.", experience_years: 12, rating_average: 5.0, total_missions: 890, daily_rate: 20000, languages: ["FR", "EN"], photo_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop", is_verified: true },
-  { id: "3", full_name: "Ibrahima S.", experience_years: 5, rating_average: 4.8, total_missions: 156, daily_rate: 12000, languages: ["FR", "WO"], photo_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop", is_verified: true },
-  { id: "4", full_name: "Abdoulaye D.", experience_years: 15, rating_average: 5.0, total_missions: 1205, daily_rate: 25000, languages: ["FR", "EN", "AR"], photo_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop", is_verified: true },
-  { id: "5", full_name: "Jean D.", experience_years: 4, rating_average: 4.5, total_missions: 80, daily_rate: 14000, languages: ["FR"], photo_url: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=1974&auto=format&fit=crop", is_verified: true },
-  { id: "6", full_name: "John S.", experience_years: 6, rating_average: 4.7, total_missions: 120, daily_rate: 18000, languages: ["EN"], photo_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop", is_verified: true },
-  { id: "7", full_name: "Youssef B.", experience_years: 10, rating_average: 4.9, total_missions: 450, daily_rate: 16000, languages: ["AR"], photo_url: "https://images.unsplash.com/photo-1566492031523-87d28ebd9cb0?q=80&w=1974&auto=format&fit=crop", is_verified: true },
+  { id: "1", full_name: "Mamadou N.", experience_years: 8, rating_average: 4.9, total_missions: 342, daily_rate: 80, languages: ["FR", "EN", "WO"], photo_url: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1974&auto=format&fit=crop", is_verified: true },
+  { id: "2", full_name: "Cheikh T.", experience_years: 12, rating_average: 5.0, total_missions: 890, daily_rate: 120, languages: ["FR", "EN"], photo_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop", is_verified: true },
+  { id: "3", full_name: "Ibrahima S.", experience_years: 5, rating_average: 4.8, total_missions: 156, daily_rate: 60, languages: ["FR", "WO"], photo_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop", is_verified: true },
+  { id: "4", full_name: "Abdoulaye D.", experience_years: 15, rating_average: 5.0, total_missions: 1205, daily_rate: 150, languages: ["FR", "EN", "AR"], photo_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop", is_verified: true },
+  { id: "5", full_name: "Jean D.", experience_years: 4, rating_average: 4.5, total_missions: 80, daily_rate: 55, languages: ["FR"], photo_url: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=1974&auto=format&fit=crop", is_verified: true },
+  { id: "6", full_name: "John S.", experience_years: 6, rating_average: 4.7, total_missions: 120, daily_rate: 90, languages: ["EN"], photo_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop", is_verified: true },
+  { id: "7", full_name: "Youssef B.", experience_years: 10, rating_average: 4.9, total_missions: 450, daily_rate: 75, languages: ["AR"], photo_url: "https://images.unsplash.com/photo-1566492031523-87d28ebd9cb0?q=80&w=1974&auto=format&fit=crop", is_verified: true },
 ];
 
 import DriverFilters from "./DriverFilters";
@@ -29,7 +29,7 @@ export default async function DriversPage(props: Props) {
   
   let query = supabase
     .from("drivers")
-    .select("*")
+    .select("*, profiles(full_name)")
     .eq("is_verified", true)
     .eq("is_available", true);
 
@@ -72,11 +72,11 @@ export default async function DriversPage(props: Props) {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
             {drivers.map((driver) => {
               const photo = (driver as any).photo_url || PLACEHOLDER_IMG;
-              const name = (driver as any).full_name;
+              const name = (driver as any).profiles?.full_name || (driver as any).full_name || "Chauffeur";
               const exp = `${(driver as any).experience_years} ans`;
               const rating = (driver as any).rating_average || 0;
               const trips = (driver as any).total_missions || 0;
-              const price = Math.round((driver as any).daily_rate / 1000);
+              const price = (driver as any).daily_rate;
               const langs = Array.isArray((driver as any).languages)
                 ? (driver as any).languages.join(", ")
                 : (driver as any).languages || "FR";
@@ -86,7 +86,7 @@ export default async function DriversPage(props: Props) {
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
                       <div className="relative w-24 h-24 rounded-full overflow-hidden shrink-0 border-2 border-zinc-800">
-                        <Image src={photo} alt={name} fill className="object-cover" unoptimized />
+                        <Image src={photo} alt={name || "Photo du chauffeur"} fill className="object-cover" unoptimized />
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-start">
@@ -102,8 +102,8 @@ export default async function DriversPage(props: Props) {
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-xl font-bold text-blue-400">{price}K</p>
-                            <p className="text-[10px] text-zinc-500 uppercase">€ / jour</p>
+                            <p className="text-xl font-bold text-blue-400">{price} €</p>
+                            <p className="text-[10px] text-zinc-500 uppercase">/ jour</p>
                           </div>
                         </div>
 

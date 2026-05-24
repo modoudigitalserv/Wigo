@@ -5,14 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/server";
 import { redirect } from "next/navigation";
+import CarStatusDropdown from "@/components/CarStatusDropdown";
 
 const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=2070&auto=format&fit=crop";
 
-const STATUS_MAP: Record<string, { label: string; style: string; icon: any }> = {
-  disponible: { label: "Disponible", style: "text-green-400 bg-green-400/10 border-green-400/20", icon: CheckCircle2 },
-  louee: { label: "Louée", style: "text-purple-400 bg-purple-400/10 border-purple-400/20", icon: Calendar },
-  maintenance: { label: "Maintenance", style: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20", icon: Wrench },
-};
+
 
 export default async function DashboardCarsPage() {
   const supabase = await createClient();
@@ -31,7 +28,7 @@ export default async function DashboardCarsPage() {
   const { data: company } = await supabase.from("companies").select("id, subscription_plan").eq("user_id", user.sub).single();
 
   const { data: cars } = company
-    ? await supabase.from("cars").select("*, car_images(image_url, is_primary)").eq("company_id", company.id).order("created_at", { ascending: false })
+    ? await supabase.from("cars").select("*, car_images(image_url, is_primary), bookings(id, status, end_date)").eq("company_id", company.id).order("created_at", { ascending: false })
     : { data: [] };
 
   const allCars = cars || [];
@@ -138,16 +135,18 @@ export default async function DashboardCarsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {allCars.map((car: any) => {
               const img = car.car_images?.find((i: any) => i.is_primary)?.image_url || PLACEHOLDER_IMG;
-              const statusInfo = STATUS_MAP[car.status] || STATUS_MAP.disponible;
-              const StatusIcon = statusInfo.icon;
+              
+              const hasActiveBooking = car.bookings?.some((b: any) => 
+                ['confirmed', 'active'].includes(b.status) &&
+                new Date(b.end_date) >= new Date()
+              ) || false;
+
               return (
                 <Card key={car.id} className="glass-card border-zinc-800/50 overflow-hidden group hover:border-zinc-700 transition-colors">
                   <div className="relative h-44 overflow-hidden bg-zinc-900">
                     <Image src={img} alt={`${car.brand} ${car.model}`} fill className="object-cover group-hover:scale-105 transition-transform duration-500" unoptimized />
                     <div className="absolute top-3 right-3">
-                      <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border backdrop-blur-md ${statusInfo.style}`}>
-                        <StatusIcon className="w-3 h-3" /> {statusInfo.label}
-                      </span>
+                      <CarStatusDropdown carId={car.id} initialStatus={car.status} isReserved={hasActiveBooking} />
                     </div>
                   </div>
                   <CardContent className="p-5">

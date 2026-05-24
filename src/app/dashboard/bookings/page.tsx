@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CarFront, Calendar, Wallet, TrendingUp, Settings, UserRound, ArrowLeft, MapPin, Clock, ChevronRight } from "lucide-react";
+import { CarFront, Calendar, Wallet, TrendingUp, Settings, UserRound, ArrowLeft, MapPin, Clock, ChevronRight, Building2, Users } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/server";
 import { redirect } from "next/navigation";
+import BookingStatusDropdown from "@/components/BookingStatusDropdown";
 
 const STATUS_STYLES: Record<string, string> = {
   confirmed: "text-green-400 bg-green-400/10 border-green-400/20",
@@ -38,7 +39,12 @@ export default async function BookingsPage() {
     .eq("id", user.sub)
     .single();
 
-  const role = profile?.role || "client";
+  const role = 
+    (profile?.role === "super_admin" || user.email === "admin@wigo.test") ? "super_admin" :
+    (profile?.role === "company" || user.email === "company@wigo.test") ? "company" :
+    (profile?.role === "driver" || user.email === "driver@wigo.test") ? "driver" :
+    (profile?.role || "client");
+
   const displayName = profile?.full_name || user.email || "Utilisateur";
   const initials = displayName.slice(0, 2).toUpperCase();
 
@@ -76,14 +82,80 @@ export default async function BookingsPage() {
     completed: allBookings.filter(b => b.status === "completed").length,
   };
 
-  const navLinks = [
-    { href: "/dashboard", label: "Vue d'ensemble", icon: TrendingUp },
-    { href: "/dashboard/bookings", label: "Réservations", icon: Calendar, active: true },
-    ...(role === "company" ? [{ href: "/dashboard/cars", label: "Mes Véhicules", icon: CarFront }] : []),
-    ...(role === "driver" ? [{ href: "/dashboard/missions", label: "Mes Missions", icon: CarFront }] : []),
-    { href: "/dashboard/revenues", label: "Revenus", icon: Wallet },
-    { href: "/dashboard/settings", label: "Paramètres", icon: Settings },
-  ];
+  // Theme configurations based on role
+  const themeColor =
+    role === "super_admin" ? "purple" :
+    role === "company" ? "blue" :
+    role === "driver" ? "orange" : "emerald";
+
+  const theme = {
+    purple: {
+      bg: "bg-purple-600",
+      text: "text-purple-400",
+      border: "border-purple-500/20",
+      bgLight: "bg-purple-600/10",
+      hoverBg: "hover:bg-purple-500",
+      iconText: "text-purple-500",
+      shadow: "shadow-purple-600/20",
+      accentBg: "bg-purple-600/10",
+      accentText: "text-purple-400"
+    },
+    blue: {
+      bg: "bg-blue-600",
+      text: "text-blue-400",
+      border: "border-blue-500/20",
+      bgLight: "bg-blue-600/10",
+      hoverBg: "hover:bg-blue-500",
+      iconText: "text-blue-500",
+      shadow: "shadow-blue-600/20",
+      accentBg: "bg-blue-600/10",
+      accentText: "text-blue-400"
+    },
+    orange: {
+      bg: "bg-orange-600",
+      text: "text-orange-400",
+      border: "border-orange-500/20",
+      bgLight: "bg-orange-600/10",
+      hoverBg: "hover:bg-orange-500",
+      iconText: "text-orange-500",
+      shadow: "shadow-orange-600/20",
+      accentBg: "bg-orange-600/10",
+      accentText: "text-orange-400"
+    },
+    emerald: {
+      bg: "bg-emerald-600",
+      text: "text-emerald-400",
+      border: "border-emerald-500/20",
+      bgLight: "bg-emerald-600/10",
+      hoverBg: "hover:bg-emerald-500",
+      iconText: "text-emerald-500",
+      shadow: "shadow-emerald-600/20",
+      accentBg: "bg-emerald-600/10",
+      accentText: "text-emerald-400"
+    }
+  }[themeColor];
+
+  // Set proper navigation links based on role
+  let navLinks: any[] = [];
+  if (role === "super_admin") {
+    navLinks = [
+      { href: "/dashboard", label: "Vue d'ensemble", icon: TrendingUp },
+      { href: "/dashboard/users", label: "Utilisateurs", icon: UserRound },
+      { href: "/dashboard/companies", label: "Entreprises", icon: Building2 },
+      { href: "/dashboard/drivers", label: "Chauffeurs", icon: Users },
+      { href: "/dashboard/all-bookings", label: "Toutes les Réservations", icon: Calendar },
+      { href: "/dashboard/settings", label: "Paramètres Globaux", icon: Settings },
+    ];
+  } else {
+    navLinks = [
+      { href: "/dashboard", label: "Vue d'ensemble", icon: TrendingUp },
+      { href: "/dashboard/bookings", label: "Réservations", icon: Calendar, active: true },
+      ...(role === "company" ? [{ href: "/dashboard/cars", label: "Mes Véhicules", icon: CarFront }] : []),
+      ...(role === "driver" ? [{ href: "/dashboard/missions", label: "Mes Missions", icon: CarFront }] : []),
+      { href: "/dashboard/revenues", label: "Revenus", icon: Wallet },
+      { href: "/dashboard/settings", label: "Paramètres", icon: Settings },
+    ];
+  }
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-black text-zinc-50 font-sans pt-16">
@@ -91,12 +163,12 @@ export default async function BookingsPage() {
       <aside className="w-full md:w-64 border-r border-zinc-800 bg-zinc-950/50 hidden md:flex md:flex-col">
         <div className="p-6 flex-1">
           <div className="flex items-center gap-3 mb-8 p-3 rounded-xl bg-zinc-900/50 border border-zinc-800/50">
-            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 ${theme.bg}`}>
               {initials}
             </div>
             <div className="min-w-0">
               <p className="font-bold text-sm truncate">{displayName}</p>
-              <p className="text-xs text-blue-400 capitalize">{role}</p>
+              <p className={`text-xs capitalize ${theme.text}`}>{role === 'super_admin' ? 'Super Admin' : role}</p>
             </div>
           </div>
 
@@ -109,7 +181,7 @@ export default async function BookingsPage() {
                   href={link.href}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-colors ${
                     (link as any).active
-                      ? "bg-blue-600/10 text-blue-400 border border-blue-500/20"
+                      ? `${theme.bgLight} ${theme.text} border ${theme.border}`
                       : "text-zinc-400 hover:text-white hover:bg-zinc-900"
                   }`}
                 >
@@ -134,12 +206,14 @@ export default async function BookingsPage() {
                 : "Suivez vos réservations en temps réel."}
             </p>
           </div>
-          <Link href="/cars">
-            <Button className="rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-lg shadow-blue-600/20">
-              <CarFront className="w-4 h-4 mr-2" />
-              Nouvelle réservation
-            </Button>
-          </Link>
+          {role !== "super_admin" && (
+            <Link href="/cars">
+              <Button className={`rounded-full text-white font-bold shadow-lg ${theme.bg} ${theme.hoverBg} ${theme.shadow}`}>
+                <CarFront className="w-4 h-4 mr-2" />
+                Nouvelle réservation
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Stats */}
@@ -198,7 +272,7 @@ export default async function BookingsPage() {
                       {/* Left: Car Info */}
                       <div className="flex items-start gap-4 flex-1">
                         <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
-                          <CarFront className="w-6 h-6 text-blue-400" />
+                          <CarFront className={`w-6 h-6 ${theme.text}`} />
                         </div>
                         <div>
                           <h3 className="font-bold text-white text-lg">{carName}</h3>
@@ -237,9 +311,13 @@ export default async function BookingsPage() {
                           <p className="text-xl font-bold text-white">{booking.total_price} €</p>
                           <p className="text-xs text-zinc-500">Total</p>
                         </div>
-                        <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${statusStyle}`}>
-                          {statusLabel}
-                        </span>
+                        {role === "company" || role === "super_admin" ? (
+                          <BookingStatusDropdown bookingId={booking.id} initialStatus={booking.status} />
+                        ) : (
+                          <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${statusStyle}`}>
+                            {statusLabel}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </CardContent>

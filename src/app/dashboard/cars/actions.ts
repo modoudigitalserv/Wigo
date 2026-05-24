@@ -89,7 +89,35 @@ export async function addCar(formData: FormData) {
   }
 
   // 5. Revalidate and redirect
-  revalidatePath("/dashboard");
-  revalidatePath("/cars");
-  redirect("/dashboard");
+  revalidatePath("/dashboard/cars");
+  redirect("/dashboard/cars");
+}
+
+export async function updateCarStatus(carId: string, status: string) {
+  const supabase = await createClient();
+
+  // 1. Verify user and role
+  const { data: authData } = await supabase.auth.getClaims();
+  const user = authData?.claims;
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  // 2. Validate status
+  if (!['disponible', 'louee', 'maintenance'].includes(status)) {
+    throw new Error("Statut invalide");
+  }
+
+  // 3. Update the car
+  const { error } = await supabase
+    .from("cars")
+    .update({ status })
+    .eq("id", carId);
+
+  if (error) {
+    console.error("Erreur de mise à jour du statut:", error);
+    throw new Error("Impossible de mettre à jour le statut");
+  }
+
+  revalidatePath("/dashboard/cars");
 }

@@ -82,7 +82,7 @@ export default async function CarsPage(props: Props) {
             {cars.map((car) => {
               const primaryImg = (car as any).car_images?.find((img: any) => img.is_primary)?.image_url || PLACEHOLDER_IMG;
               const name = `${(car as any).brand} ${(car as any).model}`;
-              const price = Math.round((car as any).price_day / 1000);
+              const price = (car as any).price_day;
               const rating = (car as any).rating_average || 0;
 
               return (
@@ -112,8 +112,8 @@ export default async function CarsPage(props: Props) {
                       </div>
                       <div className="mt-4 pt-4 border-t border-zinc-800 flex justify-between items-end">
                         <div className="text-left">
-                          <p className="text-xl font-bold text-white">{price}K</p>
-                          <p className="text-xs text-zinc-500">€ / jour</p>
+                          <p className="text-xl font-bold text-white">{price} €</p>
+                          <p className="text-xs text-zinc-500">/ jour</p>
                         </div>
                         <Button size="sm" className="bg-white text-black hover:bg-zinc-200 rounded-full font-semibold">
                           Réserver

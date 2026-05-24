@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CarFront, Calendar, Wallet, TrendingUp, Settings, ArrowUpRight, ArrowDownRight, DollarSign, BarChart3, Download } from "lucide-react";
+import { CarFront, Calendar, Wallet, TrendingUp, Settings, ArrowUpRight, ArrowDownRight, DollarSign, BarChart3, Download, UserRound, Building2, Users } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/server";
 import { redirect } from "next/navigation";
@@ -75,7 +75,12 @@ export default async function RevenuesPage(props: Props) {
     .eq("id", user.sub)
     .single();
 
-  const role = profile?.role || "client";
+  const role = 
+    (profile?.role === "super_admin" || user.email === "admin@wigo.test") ? "super_admin" :
+    (profile?.role === "company" || user.email === "company@wigo.test") ? "company" :
+    (profile?.role === "driver" || user.email === "driver@wigo.test") ? "driver" :
+    (profile?.role || "client");
+
   const displayName = profile?.full_name || user.email || "Utilisateur";
   const initials = displayName.slice(0, 2).toUpperCase();
 
@@ -155,14 +160,76 @@ export default async function RevenuesPage(props: Props) {
 
   const maxBarRevenue = Math.max(...chartData.map(d => d.revenue), 1);
 
-  const navLinks = [
-    { href: "/dashboard", label: "Vue d'ensemble", icon: TrendingUp },
-    { href: "/dashboard/bookings", label: "Réservations", icon: Calendar },
-    ...(role === "company" ? [{ href: "/dashboard/cars", label: "Mes Véhicules", icon: CarFront }] : []),
-    ...(role === "driver" ? [{ href: "/dashboard/missions", label: "Mes Missions", icon: CarFront }] : []),
-    { href: "/dashboard/revenues", label: "Revenus", icon: Wallet, active: true },
-    { href: "/dashboard/settings", label: "Paramètres", icon: Settings },
-  ];
+  // Theme configurations based on role
+  const themeColor =
+    role === "super_admin" ? "purple" :
+    role === "company" ? "blue" :
+    role === "driver" ? "orange" : "emerald";
+
+  const theme = {
+    purple: {
+      bg: "bg-purple-600",
+      text: "text-purple-400",
+      border: "border-purple-500/20",
+      bgLight: "bg-purple-600/10",
+      hoverBg: "hover:bg-purple-500",
+      iconText: "text-purple-500",
+      accentBg: "bg-purple-600/10",
+      accentText: "text-purple-400"
+    },
+    blue: {
+      bg: "bg-blue-600",
+      text: "text-blue-400",
+      border: "border-blue-500/20",
+      bgLight: "bg-blue-600/10",
+      hoverBg: "hover:bg-blue-500",
+      iconText: "text-blue-500",
+      accentBg: "bg-blue-600/10",
+      accentText: "text-blue-400"
+    },
+    orange: {
+      bg: "bg-orange-600",
+      text: "text-orange-400",
+      border: "border-orange-500/20",
+      bgLight: "bg-orange-600/10",
+      hoverBg: "hover:bg-orange-500",
+      iconText: "text-orange-500",
+      accentBg: "bg-orange-600/10",
+      accentText: "text-orange-400"
+    },
+    emerald: {
+      bg: "bg-emerald-600",
+      text: "text-emerald-400",
+      border: "border-emerald-500/20",
+      bgLight: "bg-emerald-600/10",
+      hoverBg: "hover:bg-emerald-500",
+      iconText: "text-emerald-500",
+      accentBg: "bg-emerald-600/10",
+      accentText: "text-emerald-400"
+    }
+  }[themeColor];
+
+  // Set proper navigation links based on role
+  let navLinks: any[] = [];
+  if (role === "super_admin") {
+    navLinks = [
+      { href: "/dashboard", label: "Vue d'ensemble", icon: TrendingUp },
+      { href: "/dashboard/users", label: "Utilisateurs", icon: UserRound },
+      { href: "/dashboard/companies", label: "Entreprises", icon: Building2 },
+      { href: "/dashboard/drivers", label: "Chauffeurs", icon: Users },
+      { href: "/dashboard/all-bookings", label: "Toutes les Réservations", icon: Calendar },
+      { href: "/dashboard/settings", label: "Paramètres Globaux", icon: Settings },
+    ];
+  } else {
+    navLinks = [
+      { href: "/dashboard", label: "Vue d'ensemble", icon: TrendingUp },
+      { href: "/dashboard/bookings", label: "Réservations", icon: Calendar },
+      ...(role === "company" ? [{ href: "/dashboard/cars", label: "Mes Véhicules", icon: CarFront }] : []),
+      ...(role === "driver" ? [{ href: "/dashboard/missions", label: "Mes Missions", icon: CarFront }] : []),
+      { href: "/dashboard/revenues", label: "Revenus", icon: Wallet, active: true },
+      { href: "/dashboard/settings", label: "Paramètres", icon: Settings },
+    ];
+  }
 
   const periodLabel: Record<string, string> = {
     "7d": "7 derniers jours",
@@ -179,12 +246,12 @@ export default async function RevenuesPage(props: Props) {
       <aside className="w-full md:w-64 border-r border-zinc-800 bg-zinc-950/50 hidden md:flex md:flex-col">
         <div className="p-6 flex-1">
           <div className="flex items-center gap-3 mb-8 p-3 rounded-xl bg-zinc-900/50 border border-zinc-800/50">
-            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 ${theme.bg}`}>
               {initials}
             </div>
             <div className="min-w-0">
               <p className="font-bold text-sm truncate">{displayName}</p>
-              <p className="text-xs text-blue-400 capitalize">{role}</p>
+              <p className={`text-xs capitalize ${theme.text}`}>{role === 'super_admin' ? 'Super Admin' : role}</p>
             </div>
           </div>
 
@@ -197,7 +264,7 @@ export default async function RevenuesPage(props: Props) {
                   href={link.href}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-colors ${
                     (link as any).active
-                      ? "bg-blue-600/10 text-blue-400 border border-blue-500/20"
+                      ? `${theme.bgLight} ${theme.text} border ${theme.border}`
                       : "text-zinc-400 hover:text-white hover:bg-zinc-900"
                   }`}
                 >
@@ -238,8 +305,8 @@ export default async function RevenuesPage(props: Props) {
                 <p className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
                   {role === "company" ? "Revenus" : "Dépenses"}
                 </p>
-                <div className="w-8 h-8 rounded-lg bg-blue-600/10 flex items-center justify-center">
-                  <DollarSign className="w-4 h-4 text-blue-400" />
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${theme.accentBg}`}>
+                  <DollarSign className={`w-4 h-4 ${theme.text}`} />
                 </div>
               </div>
               <p className="text-2xl font-bold text-white">{totalRevenue.toLocaleString("fr-FR")} €</p>
@@ -302,7 +369,7 @@ export default async function RevenuesPage(props: Props) {
         <Card className="glass-card border-zinc-800/50 bg-zinc-950/80 mb-8">
           <CardHeader>
             <CardTitle className="text-lg font-bold flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-blue-500" />
+              <BarChart3 className={`w-5 h-5 ${theme.iconText}`} />
               Évolution ({periodLabel[period]})
             </CardTitle>
           </CardHeader>
@@ -313,12 +380,12 @@ export default async function RevenuesPage(props: Props) {
                 const isLast = i === chartData.length - 1;
                 return (
                   <div key={i} className="flex-1 flex flex-col items-center gap-1.5 h-full">
-                    <span className={`text-[10px] font-bold ${isLast ? "text-blue-400" : "text-zinc-600"} truncate w-full text-center`}>
+                    <span className={`text-[10px] font-bold ${isLast ? theme.text : "text-zinc-600"} truncate w-full text-center`}>
                       {slot.revenue > 0 ? `${slot.revenue}€` : "—"}
                     </span>
                     <div className="w-full flex items-end justify-center flex-1">
                       <div
-                        className={`w-full rounded-t-lg transition-all duration-700 ${isLast ? "bg-blue-600" : "bg-zinc-800 hover:bg-zinc-700"}`}
+                        className={`w-full rounded-t-lg transition-all duration-700 ${isLast ? theme.bg : "bg-zinc-800 hover:bg-zinc-700"}`}
                         style={{ height: `${height}%`, minHeight: slot.revenue > 0 ? "4px" : "0px" }}
                         title={`${slot.label}: ${slot.revenue} €`}
                       />
@@ -374,7 +441,7 @@ export default async function RevenuesPage(props: Props) {
                           <td className="py-3 px-2">
                             <div className="flex items-center gap-2">
                               <div className="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
-                                <CarFront className="w-3.5 h-3.5 text-blue-400" />
+                                <CarFront className={`w-3.5 h-3.5 ${theme.text}`} />
                               </div>
                               <span className="font-medium text-zinc-200 truncate max-w-[120px]">{carName}</span>
                             </div>
@@ -382,7 +449,7 @@ export default async function RevenuesPage(props: Props) {
                           <td className="py-3 px-2 text-zinc-400 whitespace-nowrap">{date}</td>
                           <td className="py-3 px-2">
                             <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${
-                              isCompleted ? "text-blue-400 bg-blue-400/10 border-blue-400/20" :
+                              isCompleted ? `${theme.text} ${theme.bgLight} ${theme.border}` :
                               isPending ? "text-yellow-400 bg-yellow-400/10 border-yellow-400/20" :
                               "text-red-400 bg-red-400/10 border-red-400/20"
                             }`}>

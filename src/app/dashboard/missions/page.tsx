@@ -4,6 +4,7 @@ import { CarFront, Calendar, Wallet, TrendingUp, Settings, Star, Clock, CheckCir
 import Link from "next/link";
 import { createClient } from "@/lib/server";
 import { redirect } from "next/navigation";
+import MissionStatusDropdown from "@/components/MissionStatusDropdown";
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20",
@@ -81,10 +82,10 @@ export default async function MissionsPage() {
       <aside className="w-full md:w-64 border-r border-zinc-800 bg-zinc-950/50 hidden md:flex md:flex-col">
         <div className="p-6 flex-1">
           <div className="flex items-center gap-3 mb-8 p-3 rounded-xl bg-zinc-900/50 border border-zinc-800/50">
-            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0">{initials}</div>
+            <div className="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center text-white font-bold text-sm shrink-0">{initials}</div>
             <div className="min-w-0">
               <p className="font-bold text-sm truncate">{displayName}</p>
-              <p className="text-xs text-blue-400 capitalize">{role}</p>
+              <p className="text-xs text-orange-400 capitalize">{role}</p>
             </div>
           </div>
           <nav className="space-y-1">
@@ -93,7 +94,7 @@ export default async function MissionsPage() {
               return (
                 <Link key={link.href} href={link.href}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-colors ${
-                    (link as any).active ? "bg-blue-600/10 text-blue-400 border border-blue-500/20" : "text-zinc-400 hover:text-white hover:bg-zinc-900"
+                    (link as any).active ? "bg-orange-600/10 text-orange-400 border border-orange-500/20" : "text-zinc-400 hover:text-white hover:bg-zinc-900"
                   }`}>
                   <Icon className="w-4 h-4" />{link.label}
                 </Link>
@@ -148,7 +149,7 @@ export default async function MissionsPage() {
             </div>
             <div className="w-full h-2 bg-zinc-900 rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all ${quotaReached ? "bg-red-500" : "bg-blue-600"}`}
+                className={`h-full rounded-full transition-all ${quotaReached ? "bg-red-500" : "bg-orange-600"}`}
                 style={{ width: `${Math.min((usedMissions / maxMissions) * 100, 100)}%` }}
               />
             </div>
@@ -160,7 +161,7 @@ export default async function MissionsPage() {
           {[
             { label: "En attente", value: pendingMissions, color: "text-yellow-400" },
             { label: "En cours", value: activeMissions, color: "text-purple-400" },
-            { label: "Terminées", value: completedMissions, color: "text-blue-400" },
+            { label: "Terminées", value: completedMissions, color: "text-orange-400" },
             { label: "Revenus", value: `${totalEarnings.toLocaleString("fr-FR")} €`, color: "text-green-400" },
           ].map(s => (
             <Card key={s.label} className="glass-card border-zinc-800/50 bg-zinc-950/80">
@@ -186,8 +187,6 @@ export default async function MissionsPage() {
             {allMissions.map((mission: any) => {
               const customer = mission.profiles;
               const status = mission.status || "pending";
-              const statusStyle = STATUS_STYLES[status] || STATUS_STYLES.pending;
-              const statusLabel = STATUS_LABELS[status] || status;
               const date = new Date(mission.start_date || mission.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
               const duration = mission.duration_hours ? `${mission.duration_hours}h` : "Journée";
 
@@ -197,7 +196,7 @@ export default async function MissionsPage() {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="flex items-start gap-4 flex-1">
                         <div className="w-11 h-11 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
-                          <CarFront className="w-5 h-5 text-blue-400" />
+                          <CarFront className="w-5 h-5 text-orange-400" />
                         </div>
                         <div>
                           <h3 className="font-bold text-white">
@@ -217,22 +216,9 @@ export default async function MissionsPage() {
                         <div className="text-right">
                           <p className="text-xl font-bold text-white">{mission.total_price || 0} €</p>
                         </div>
-                        <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border whitespace-nowrap ${statusStyle}`}>
-                          {statusLabel}
-                        </span>
+                        <MissionStatusDropdown bookingId={mission.id} initialStatus={status} />
                       </div>
                     </div>
-
-                    {status === "pending" && (
-                      <div className="flex gap-3 mt-4 pt-4 border-t border-zinc-800/50">
-                        <Button size="sm" className="rounded-full bg-green-600 hover:bg-green-500 text-white font-bold text-xs flex-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Accepter
-                        </Button>
-                        <Button size="sm" variant="outline" className="rounded-full border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs flex-1">
-                          <XCircle className="w-3.5 h-3.5 mr-1" /> Refuser
-                        </Button>
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
               );
