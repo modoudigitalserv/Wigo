@@ -6,8 +6,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, CarFront, UploadCloud } from "lucide-react";
 import Link from "next/link";
 import { addCar } from "../actions";
+import { createClient } from "@/lib/server";
+import { redirect } from "next/navigation";
 
-export default function NewCarPage() {
+export default async function NewCarPage() {
+  const supabase = await createClient();
+
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims;
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.sub).single();
+  if (profile?.role !== "company") {
+    redirect("/dashboard");
+  }
   return (
     <div className="min-h-screen bg-black text-zinc-50 pt-24 pb-12 px-4 md:px-8">
       <div className="max-w-4xl mx-auto">
