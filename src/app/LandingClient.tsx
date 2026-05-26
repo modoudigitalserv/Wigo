@@ -1,478 +1,498 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Calendar, Search, Star, ShieldCheck, CarFront, UserRound, ArrowRight, CheckCircle2, TrendingUp, Building2, Briefcase, Zap, StarHalf, Quote } from "lucide-react";
+import { MapPin, Calendar, Search, Star, ShieldCheck, CarFront, UserRound, ArrowRight, CheckCircle2, ChevronRight, Mail } from "lucide-react";
 
-const PLACEHOLDER_CAR = "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=2070&auto=format&fit=crop";
+const HERO_BG = "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?q=80&w=2070&auto=format&fit=crop";
+const TESLA_IMG = "https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=2070&auto=format&fit=crop";
+const RANGE_IMG = "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?q=80&w=2070&auto=format&fit=crop";
+const MERCEDES_IMG = "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=2070&auto=format&fit=crop";
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
+const DRIVERS = [
+  {
+    name: "Jean D.",
+    role: "Partenaire Élite",
+    exp: "12 ans exp.",
+    quote: "La ponctualité est la politesse des rois. Votre confort est ma priorité absolue.",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop"
+  },
+  {
+    name: "Marc A.",
+    role: "Chauffeur Spécialisé",
+    exp: "8 ans exp.",
+    quote: "Spécialisé dans les transferts VIP. Je garantis une discrétion totale pour tous vos trajets.",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop"
+  },
+  {
+    name: "Sophie L.",
+    role: "Concierge Drive",
+    exp: "15 ans exp.",
+    quote: "Plus qu'un trajet, une expérience sur mesure adaptée à votre emploi du temps.",
+    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1974&auto=format&fit=crop"
   }
-};
+];
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-};
+export default function LandingClient({ cars }: { cars: any[] }) {
+  const [selectedService, setSelectedService] = useState("Voiture Seule");
 
-export default function LandingClient({ cars, totalCars, totalDrivers }: { cars: unknown[], totalCars: string | number, totalDrivers: string | number }) {
-  const stats = [
-    { label: "Véhicules", value: totalCars, icon: CarFront },
-    { label: "Chauffeurs vérifiés", value: totalDrivers, icon: UserRound },
-    { label: "Villes couvertes", value: "12", icon: MapPin },
+  // Format cars to map standard structure or mock if empty
+  const featuredCars = [
+    {
+      id: cars[0]?.id || "1",
+      brand: cars[0]?.brand || "Tesla",
+      model: cars[0]?.model || "Model S Plaid",
+      category: "PREMIUM ELECTRIC",
+      specs: "Autonomie 630km • 0-100 en 2.1s",
+      price: cars[0]?.price_day || 450,
+      image: cars[0]?.car_images?.find((i: any) => i.is_primary)?.image_url || TESLA_IMG
+    },
+    {
+      id: cars[1]?.id || "2",
+      brand: cars[1]?.brand || "Range Rover",
+      model: cars[1]?.model || "Sport M-Sport",
+      category: "LUXURY SUV",
+      specs: "Confort Absolu • 5 Places",
+      price: cars[1]?.price_day || 350,
+      image: cars[1]?.car_images?.find((i: any) => i.is_primary)?.image_url || RANGE_IMG
+    },
+    {
+      id: cars[2]?.id || "3",
+      brand: cars[2]?.brand || "Mercedes-Benz",
+      model: cars[2]?.model || "Classe S",
+      category: "BUSINESS CLASS",
+      specs: "L'Icône du Luxe",
+      price: cars[2]?.price_day || 500,
+      image: cars[2]?.car_images?.find((i: any) => i.is_primary)?.image_url || MERCEDES_IMG
+    }
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-black text-zinc-50 font-sans pb-24 md:pb-0 overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-[#070708] text-zinc-100 font-sans overflow-hidden">
       
-      {/* Hero Section */}
-      <section className="relative w-full h-[90vh] flex flex-col items-center justify-center overflow-hidden">
+      {/* 1. HERO SECTION */}
+      <section className="relative w-full min-h-screen flex flex-col items-center justify-center pt-24 px-4 overflow-hidden">
+        {/* Background Image & Glowing vertical lines */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?q=80&w=2069&auto=format&fit=crop"
-            alt="Luxury Car Background"
+            src={HERO_BG}
+            alt="Luxury Car Tunnel"
             fill
-            className="object-cover object-center opacity-40"
+            className="object-cover object-center opacity-30 mix-blend-screen"
             priority
             unoptimized
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-transparent" />
+          {/* Neon vertical highlights simulation */}
+          <div className="absolute inset-y-0 left-1/4 w-[1px] bg-gradient-to-b from-transparent via-blue-500/20 to-transparent blur-[2px]" />
+          <div className="absolute inset-y-0 right-1/4 w-[1px] bg-gradient-to-b from-transparent via-blue-500/20 to-transparent blur-[2px]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#070708] via-[#070708]/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#070708]/80 via-transparent to-[#070708]" />
         </div>
 
-        <motion.div 
-          initial="hidden"
-          animate="show"
-          variants={containerVariants}
-          className="relative z-10 container mx-auto px-4 text-center mt-16"
-        >
-          <motion.span variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-sm font-medium text-blue-400 mb-6 border-blue-500/20">
-            <ShieldCheck className="w-4 h-4" /> La Plateforme n°1 au Maroc
-          </motion.span>
-          <motion.h1 variants={itemVariants} className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight mb-6 leading-tight">
-            L&apos;Excellence <br />
-            <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-indigo-600 bg-clip-text text-transparent">
-              en Mouvement
+        <div className="relative z-10 container mx-auto max-w-5xl text-center flex flex-col items-center">
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight text-white"
+          >
+            L&apos;Excellence du Voyage,<br />
+            <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent">
+              Redéfinie.
             </span>
           </motion.h1>
-          <motion.p variants={itemVariants} className="text-lg md:text-xl text-zinc-300 max-w-2xl mx-auto mb-10">
-            La marketplace de référence pour louer des véhicules d&apos;exception, avec ou sans chauffeur privé, en quelques clics.
+
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-zinc-400 text-sm sm:text-base md:text-lg max-w-xl mb-12 leading-relaxed"
+          >
+            Accédez à une flotte exclusive de véhicules de prestige et des chauffeurs d&apos;exception pour vos déplacements les plus exigeants.
           </motion.p>
 
           {/* Floating Search Bar */}
-          <motion.div variants={itemVariants} className="max-w-4xl mx-auto glass rounded-3xl md:rounded-full p-2 flex flex-col md:flex-row items-center gap-2 md:gap-4 backdrop-blur-2xl bg-black/40 border-white/10 shadow-[0_0_40px_rgba(37,99,235,0.15)]">
-            <div className="flex-1 flex items-center gap-3 px-6 py-4 w-full border-b md:border-b-0 md:border-r border-zinc-800">
-              <MapPin className="w-5 h-5 text-zinc-400" />
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="w-full max-w-4xl bg-zinc-950/80 border border-zinc-800/80 rounded-3xl p-3 flex flex-col md:flex-row items-center gap-3 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+          >
+            <div className="flex-1 flex items-center gap-3 px-4 py-3 w-full border-b md:border-b-0 md:border-r border-zinc-800">
+              <MapPin className="w-5 h-5 text-blue-500 shrink-0" />
               <div className="text-left w-full">
-                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Lieu de prise en charge</p>
-                <input type="text" placeholder="Casablanca, Rabat..." className="bg-transparent border-none outline-none text-white w-full placeholder-zinc-600 font-medium text-sm md:text-base" />
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-0.5">Lieu</p>
+                <input type="text" placeholder="Paris, France" className="bg-transparent border-none outline-none text-white w-full placeholder-zinc-700 font-semibold text-sm" />
               </div>
             </div>
             
-            <div className="flex-1 flex items-center gap-3 px-6 py-4 w-full border-b md:border-b-0 md:border-r border-zinc-800">
-              <Calendar className="w-5 h-5 text-zinc-400" />
+            <div className="flex-1 flex items-center gap-3 px-4 py-3 w-full border-b md:border-b-0 md:border-r border-zinc-800">
+              <Calendar className="w-5 h-5 text-blue-500 shrink-0" />
               <div className="text-left w-full">
-                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Dates de location</p>
-                <input type="text" placeholder="Ajouter des dates" className="bg-transparent border-none outline-none text-white w-full placeholder-zinc-600 font-medium text-sm md:text-base" />
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-0.5">Date</p>
+                <input type="text" placeholder="mm/dd/yyyy" className="bg-transparent border-none outline-none text-white w-full placeholder-zinc-700 font-semibold text-sm" />
               </div>
             </div>
 
-            <Link href="/cars" className="w-full md:w-auto p-1">
-              <Button size="lg" className="w-full h-14 md:h-16 px-8 rounded-2xl md:rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-lg shadow-lg shadow-blue-600/30 transition-all hover:scale-105 active:scale-95">
-                <Search className="w-5 h-5 mr-2" />
-                Rechercher
+            <div className="flex-1 flex items-center gap-3 px-4 py-3 w-full border-b md:border-b-0 md:border-r border-zinc-800">
+              <UserRound className="w-5 h-5 text-blue-500 shrink-0" />
+              <div className="text-left w-full">
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-0.5">Service</p>
+                <select 
+                  value={selectedService} 
+                  onChange={(e) => setSelectedService(e.target.value)} 
+                  className="bg-transparent border-none outline-none text-white w-full font-semibold text-sm appearance-none cursor-pointer"
+                >
+                  <option value="Chauffeur Privé">Chauffeur Privé</option>
+                  <option value="Voiture Seule">Voiture Seule</option>
+                  <option value="Voiture + Chauffeur">Voiture + Chauffeur</option>
+                </select>
+              </div>
+            </div>
+
+            <Link href="/cars" className="w-full md:w-auto">
+              <Button size="lg" className="w-full md:w-14 h-14 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold p-0 flex items-center justify-center shadow-lg shadow-blue-600/30">
+                <Search className="w-5 h-5" />
               </Button>
             </Link>
           </motion.div>
-        </motion.div>
-      </section>
 
-      {/* Stats Bar */}
-      <section className="relative z-20 -mt-12 mb-20 container mx-auto px-4 max-w-5xl">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="glass rounded-3xl p-6 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4 divide-y md:divide-y-0 md:divide-x divide-white/10"
-        >
-          {stats.map((stat, i) => {
-            const Icon = stat.icon;
-            return (
-              <div key={i} className="flex flex-col items-center justify-center text-center pt-4 md:pt-0 first:pt-0">
-                <div className="w-12 h-12 mb-3 rounded-full bg-blue-600/10 border border-blue-500/20 flex items-center justify-center">
-                  <Icon className="w-6 h-6 text-blue-400" />
-                </div>
-                <p className="text-3xl font-extrabold text-white mb-1">{stat.value}</p>
-                <p className="text-sm text-zinc-400 font-medium">{stat.label}</p>
-              </div>
-            );
-          })}
-        </motion.div>
-      </section>
-
-      {/* Comment ça marche */}
-      <section className="container mx-auto px-4 py-16 max-w-7xl">
-        <div className="text-center mb-16">
-          <motion.span 
-            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-            className="text-blue-500 font-semibold tracking-wider uppercase text-sm"
-          >
-            Simple et Rapide
-          </motion.span>
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            className="text-3xl md:text-5xl font-bold mt-2"
-          >
-            Comment ça marche ?
-          </motion.h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { icon: Search, title: "1. Trouvez votre idéal", desc: "Parcourez notre large sélection de véhicules premium et de chauffeurs professionnels." },
-            { icon: Calendar, title: "2. Réservez facilement", desc: "Sélectionnez vos dates, confirmez vos options et finalisez votre réservation en un instant." },
-            { icon: CheckCircle2, title: "3. Profitez du trajet", desc: "Récupérez votre véhicule ou attendez votre chauffeur à l'heure convenue, en toute sérénité." }
-          ].map((step, i) => (
-            <motion.div 
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.2 }}
-              className="text-center flex flex-col items-center group"
-            >
-              <div className="w-20 h-20 rounded-3xl glass flex items-center justify-center mb-6 group-hover:-translate-y-2 transition-transform duration-300 shadow-xl shadow-blue-900/10 border-blue-500/20">
-                <step.icon className="w-8 h-8 text-blue-400" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">{step.title}</h3>
-              <p className="text-zinc-400">{step.desc}</p>
-            </motion.div>
-          ))}
+          {/* Hero Stats */}
+          <div className="grid grid-cols-3 gap-6 sm:gap-12 mt-20 w-full max-w-4xl border-t border-zinc-900 pt-8 pb-12">
+            <div className="text-center">
+              <p className="text-2xl sm:text-4xl font-extrabold text-white">10k+</p>
+              <p className="text-[10px] sm:text-xs text-zinc-500 font-bold uppercase tracking-wider mt-1">Véhicules de Prestige</p>
+            </div>
+            <div className="text-center border-x border-zinc-900">
+              <p className="text-2xl sm:text-4xl font-extrabold text-white">500+</p>
+              <p className="text-[10px] sm:text-xs text-zinc-500 font-bold uppercase tracking-wider mt-1">Chauffeurs Certifiés</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl sm:text-4xl font-extrabold text-white">24/7</p>
+              <p className="text-[10px] sm:text-xs text-zinc-500 font-bold uppercase tracking-wider mt-1">Support Dédié</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Featured Cars Section */}
-      <section className="container mx-auto px-4 py-24 max-w-7xl">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-          className="flex flex-col md:flex-row items-end justify-between mb-12 gap-4"
-        >
+      {/* 2. VEHICULES POPULAIRES (Asymmetric Grid) */}
+      <section className="container mx-auto px-4 py-20 max-w-7xl">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-12 gap-4">
           <div>
-            <h2 className="text-3xl md:text-5xl font-bold">Véhicules Populaires</h2>
-            <p className="text-zinc-400 mt-3 text-lg">Découvrez les voitures les plus demandées par nos clients.</p>
+            <h2 className="text-3xl font-bold text-white tracking-tight">Véhicules Populaires</h2>
+            <p className="text-zinc-500 mt-2 text-sm">L&apos;alliance parfaite de la technologie et du confort.</p>
           </div>
-          <Link href="/cars">
-            <Button variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10 text-white rounded-full h-12 px-6">
-              Voir la flotte <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+          <Link href="/cars" className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white font-semibold group">
+            Voir toute la flotte 
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {cars.map((carItem, i) => {
-            const car = carItem as {
-              id: string;
-              brand: string;
-              model: string;
-              price_day: number;
-              rating_average?: number;
-              transmission?: string;
-              fuel?: string;
-              car_images?: { is_primary?: boolean; image_url?: string }[];
-            };
-            const primaryImg = car.car_images?.find((img) => img.is_primary)?.image_url || PLACEHOLDER_CAR;
-            const name = `${car.brand} ${car.model}`;
-            const price = car.price_day;
-            const rating = car.rating_average || 5.0;
-
-            return (
-              <motion.div 
-                key={car.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <Link href={`/cars/${car.id}`}>
-                  <Card className="glass-card overflow-hidden group cursor-pointer border-white/5 bg-zinc-900/40">
-                    <div className="relative h-64 overflow-hidden rounded-t-3xl bg-zinc-950">
-                      <Image
-                        src={primaryImg}
-                        alt={name}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out opacity-90 group-hover:opacity-100"
-                        unoptimized
-                      />
-                      <div className="absolute top-4 right-4 glass px-3 py-1.5 rounded-full flex items-center gap-1.5 backdrop-blur-md bg-black/50 border-white/10">
-                        <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
-                        <span className="text-xs font-bold text-white">{rating.toFixed(1)}</span>
-                      </div>
-                      <div className="absolute top-4 left-4">
-                         <span className="bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
-                           Populaire
-                         </span>
-                      </div>
-                    </div>
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">{name}</h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-zinc-400 capitalize px-2 py-1 bg-white/5 rounded-md">{car.transmission}</span>
-                            <span className="text-xs text-zinc-400 capitalize px-2 py-1 bg-white/5 rounded-md">{car.fuel}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="pt-4 border-t border-white/5 flex items-end justify-between">
-                        <div>
-                          <p className="text-sm text-zinc-500 mb-1">À partir de</p>
-                          <div className="flex items-baseline gap-1">
-                            <p className="text-2xl font-bold text-white">{price} €</p>
-                            <span className="text-sm text-zinc-500">/ jour</span>
-                          </div>
-                        </div>
-                        <div className="w-10 h-10 rounded-full bg-blue-600/10 flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-300">
-                          <ArrowRight className="w-5 h-5 text-blue-500 group-hover:text-white" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              </motion.div>
-            );
-          })}
         </div>
-      </section>
 
-      {/* B2B Section */}
-      <section className="container mx-auto px-4 py-16 max-w-7xl">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          className="relative rounded-3xl overflow-hidden glass border-white/10"
-        >
-          <div className="absolute inset-0 z-0">
-             <Image 
-                src="https://images.unsplash.com/photo-1560179707-f14e90ef3623?q=80&w=2073&auto=format&fit=crop"
-                alt="Business Dashboard"
-                fill
-                className="object-cover opacity-20 mix-blend-luminosity"
-                unoptimized
-             />
-             <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
-          </div>
+        {/* Asymmetric Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          <div className="relative z-10 p-10 md:p-16 flex flex-col md:flex-row items-center gap-12">
-            <div className="flex-1">
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-bold text-white mb-4 uppercase tracking-wider">
-                <Building2 className="w-4 h-4" /> B2B SaaS
-              </span>
-              <h2 className="text-3xl md:text-5xl font-bold mb-4">Propulsez votre agence de location</h2>
-              <p className="text-zinc-300 text-lg mb-8 max-w-xl">
-                Rejoignez la marketplace Wigo et gérez toute votre flotte automobile depuis un tableau de bord puissant. Augmentez votre visibilité et vos revenus.
-              </p>
-              <ul className="space-y-4 mb-8">
-                {["Gestion centralisée de votre flotte", "Paiements sécurisés par Stripe", "Statistiques et prévisions de revenus", "Visibilité premium sur la marketplace"].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-zinc-300 font-medium">
-                    <CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/register?role=company">
-                <Button size="lg" className="h-14 px-8 rounded-full bg-white text-black hover:bg-zinc-200 font-bold text-base">
-                  Devenir Loueur Partenaire
-                </Button>
-              </Link>
-            </div>
-            <div className="flex-1 hidden md:block">
-               {/* Decorative Dashboard mock */}
-               <div className="glass rounded-2xl p-6 shadow-2xl border-white/20 transform rotate-2 hover:rotate-0 transition-transform duration-500">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <p className="text-zinc-400 text-sm">Revenus mensuels</p>
-                      <p className="text-2xl font-bold">12,450 €</p>
-                    </div>
-                    <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                      <TrendingUp className="w-5 h-5 text-green-500" />
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    {[1, 2, 3].map((v) => (
-                      <div key={v} className="h-12 w-full bg-white/5 rounded-xl border border-white/10" />
-                    ))}
-                  </div>
-               </div>
-            </div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Drivers Section */}
-      <section className="container mx-auto px-4 py-16 max-w-7xl">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          className="relative rounded-3xl overflow-hidden glass border-blue-500/20 bg-gradient-to-br from-blue-950/40 to-indigo-900/20"
-        >
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-600/20 via-transparent to-transparent opacity-50" />
-          
-          <div className="relative z-10 p-10 md:p-16 flex flex-col md:flex-row-reverse items-center gap-12">
-            <div className="flex-1">
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-xs font-bold text-blue-300 mb-4 uppercase tracking-wider">
-                <UserRound className="w-4 h-4" /> Chauffeurs
-              </span>
-              <h2 className="text-3xl md:text-5xl font-bold mb-4">Gagnez plus avec Wigo</h2>
-              <p className="text-zinc-300 text-lg mb-8 max-w-xl">
-                Devenez chauffeur indépendant sur notre plateforme. Recevez des missions exclusives, gérez votre planning et développez votre clientèle premium.
-              </p>
-              <div className="grid grid-cols-2 gap-6 mb-8">
-                <div className="glass p-4 rounded-2xl bg-black/20">
-                  <Briefcase className="w-6 h-6 text-blue-400 mb-2" />
-                  <h4 className="font-bold text-white">Missions VIP</h4>
-                  <p className="text-sm text-zinc-400 mt-1">Clients d&apos;affaires et tourisme premium</p>
-                </div>
-                <div className="glass p-4 rounded-2xl bg-black/20">
-                  <Zap className="w-6 h-6 text-blue-400 mb-2" />
-                  <h4 className="font-bold text-white">Liberté totale</h4>
-                  <p className="text-sm text-zinc-400 mt-1">Choisissez quand vous voulez travailler</p>
-                </div>
-              </div>
-              <Link href="/register?role=driver">
-                <Button size="lg" className="h-14 px-8 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-base shadow-lg shadow-blue-600/30">
-                  Créer un compte Chauffeur
-                </Button>
-              </Link>
-            </div>
-            <div className="flex-1 w-full relative h-[400px] hidden md:block">
+          {/* Large Left Card (1st Car) */}
+          <Link href={`/cars/${featuredCars[0].id}`} className="lg:col-span-2 group">
+            <div className="relative h-[480px] rounded-3xl overflow-hidden bg-zinc-950 border border-zinc-900/60 p-8 flex flex-col justify-end">
               <Image 
-                src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=2070&auto=format&fit=crop"
-                alt="Chauffeur"
+                src={featuredCars[0].image}
+                alt={featuredCars[0].brand}
                 fill
-                className="object-cover rounded-2xl shadow-2xl"
+                className="object-cover opacity-70 group-hover:scale-105 transition-transform duration-700 ease-out"
                 unoptimized
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-2xl" />
-              <div className="absolute bottom-6 left-6 right-6 glass p-4 rounded-xl flex items-center gap-4 border-white/20">
-                <div className="w-12 h-12 rounded-full bg-blue-500/20 flex flex-col items-center justify-center border border-blue-400/30">
-                   <span className="text-xs font-bold text-blue-300">NOTE</span>
-                   <span className="text-sm font-extrabold text-white">4.9</span>
-                </div>
-                <div>
-                   <p className="font-bold text-white">"La meilleure plateforme pour les VTC"</p>
-                   <p className="text-xs text-zinc-300">Youssef, Chauffeur certifié</p>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#070708] via-[#070708]/30 to-transparent" />
+              
+              <div className="relative z-10">
+                <span className="text-[10px] font-extrabold tracking-widest text-blue-400 border border-blue-500/20 bg-blue-500/5 px-3 py-1 rounded-full uppercase">
+                  {featuredCars[0].category}
+                </span>
+                <h3 className="text-3xl font-extrabold text-white mt-4">{featuredCars[0].brand} {featuredCars[0].model}</h3>
+                <p className="text-zinc-400 text-sm mt-1">{featuredCars[0].specs}</p>
+                
+                <div className="flex items-end justify-between mt-6 pt-6 border-t border-zinc-900/80">
+                  <div>
+                    <span className="text-xs text-zinc-500 block">À partir de</span>
+                    <span className="text-2xl font-black text-white">{featuredCars[0].price} € <span className="text-xs font-normal text-zinc-500">/ jour</span></span>
+                  </div>
+                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-600/30">
+                    <ChevronRight className="w-6 h-6" />
+                  </div>
                 </div>
               </div>
             </div>
+          </Link>
+
+          {/* Right Stacked Cards (2nd & 3rd Cars) */}
+          <div className="flex flex-col gap-6">
+            {featuredCars.slice(1).map((car) => (
+              <Link key={car.id} href={`/cars/${car.id}`} className="group flex-1">
+                <div className="relative h-[228px] rounded-3xl overflow-hidden bg-zinc-950 border border-zinc-900/60 p-6 flex flex-col justify-end">
+                  <Image 
+                    src={car.image}
+                    alt={car.brand}
+                    fill
+                    className="object-cover opacity-70 group-hover:scale-105 transition-transform duration-700 ease-out"
+                    unoptimized
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#070708] via-[#070708]/30 to-transparent" />
+                  
+                  <div className="relative z-10">
+                    <h4 className="text-xl font-bold text-white">{car.brand} {car.model}</h4>
+                    <p className="text-xs text-zinc-400 mt-0.5">{car.specs}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
-        </motion.div>
+
+        </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="container mx-auto px-4 py-24 max-w-7xl">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">Ils nous font confiance</h2>
-          <p className="text-zinc-400 text-lg">Rejoignez des milliers d&apos;utilisateurs satisfaits.</p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { name: "Amine K.", role: "Client régulier", text: "Service impeccable. J'ai loué une Range Rover pour le week-end, la voiture était parfaite et le processus de réservation ultra fluide.", rating: 5 },
-            { name: "Global Rentals", role: "Loueur Partenaire", text: "Depuis que nous utilisons Wigo pour gérer notre flotte, notre taux d'occupation a grimpé de 40%. Le dashboard est incroyablement bien conçu.", rating: 5 },
-            { name: "Sarah M.", role: "Cliente", text: "Le service chauffeur est fantastique. Mon vol a eu du retard mais le chauffeur m'attendait avec le sourire. Je recommande vivement.", rating: 5 }
-          ].map((review, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.15 }}
-            >
-              <Card className="glass-card h-full bg-black/40 border-white/5 p-8 relative">
-                <Quote className="absolute top-6 right-6 w-12 h-12 text-white/5" />
-                <div className="flex gap-1 mb-6">
-                  {[...Array(review.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                  ))}
+      {/* 3. CHAUFFEURS D'EXCELLENCE */}
+      <section className="container mx-auto px-4 py-20 max-w-7xl text-center">
+        <h2 className="text-3xl font-bold text-white tracking-tight">Chauffeurs d&apos;Excellence</h2>
+        <p className="text-zinc-500 mt-2 max-w-lg mx-auto text-sm">
+          Nos chauffeurs sont rigoureusement sélectionnés et formés pour vous offrir une discrétion absolue et un service irréprochable.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+          {DRIVERS.map((driver, i) => (
+            <div key={i} className="flex flex-col items-center p-6 bg-[#0c0c0e] rounded-3xl border border-zinc-900/40 relative">
+              <div className="relative w-24 h-24 mb-6">
+                <Image 
+                  src={driver.image}
+                  alt={driver.name}
+                  fill
+                  className="object-cover rounded-full border border-zinc-800"
+                  unoptimized
+                />
+                <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-blue-600 border-2 border-[#0c0c0e] flex items-center justify-center shadow-lg">
+                  <ShieldCheck className="w-3.5 h-3.5 text-white" />
                 </div>
-                <p className="text-zinc-300 text-lg mb-8 relative z-10 leading-relaxed">"{review.text}"</p>
-                <div className="flex items-center gap-4 mt-auto">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-white text-lg">
-                    {review.name.charAt(0)}
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white">{review.name}</h4>
-                    <p className="text-sm text-zinc-500">{review.role}</p>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
+              </div>
+
+              <h4 className="text-lg font-bold text-white">{driver.name}</h4>
+              <p className="text-[10px] font-extrabold tracking-wider text-blue-400 uppercase mt-1">{driver.role} • {driver.exp}</p>
+              
+              <p className="text-zinc-400 text-sm mt-6 leading-relaxed italic">
+                &ldquo;{driver.quote}&rdquo;
+              </p>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 bg-black/50 backdrop-blur-xl py-12 md:py-16 mt-12 relative z-10">
+      {/* 4. NOS PLANS PRIVILEGES */}
+      <section className="container mx-auto px-4 py-20 max-w-7xl text-center">
+        <h2 className="text-3xl font-bold text-white tracking-tight">Nos Plans Privilèges</h2>
+        <p className="text-zinc-500 mt-2 max-w-lg mx-auto text-sm">
+          Optimisez vos déplacements avec nos formules exclusives.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 max-w-5xl mx-auto items-center">
+          
+          {/* Starter Plan */}
+          <Card className="glass-card bg-[#09090b] border-zinc-900 p-8 rounded-3xl text-left flex flex-col h-[500px]">
+            <div className="mb-6">
+              <span className="text-[10px] font-extrabold tracking-wider text-zinc-500 uppercase">Essentiel</span>
+              <h3 className="text-2xl font-bold text-white mt-1">Starter</h3>
+              <div className="flex items-baseline gap-1 mt-4">
+                <span className="text-3xl font-black text-white">299€</span>
+                <span className="text-zinc-500 text-xs">/ mois</span>
+              </div>
+            </div>
+            <ul className="space-y-4 my-auto">
+              <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" /> Accès flotte standard
+              </li>
+              <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" /> Réservation 24h à l&apos;avance
+              </li>
+              <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" /> Service client de base
+              </li>
+            </ul>
+            <Link href="/register?role=driver" className="mt-8">
+              <Button variant="outline" className="w-full rounded-full border-zinc-800 bg-zinc-950 hover:bg-zinc-900 text-white font-bold h-12">
+                Choisir ce plan
+              </Button>
+            </Link>
+          </Card>
+
+          {/* Elite Plan (Highlighted) */}
+          <Card className="glass-card bg-blue-600 border-none p-8 rounded-3xl text-left flex flex-col h-[540px] shadow-[0_20px_50px_rgba(37,99,235,0.3)] relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-blue-500 text-white text-[9px] font-extrabold uppercase py-1 px-4 tracking-wider rounded-bl-xl">
+              Recommandé
+            </div>
+            <div className="mb-6">
+              <span className="text-[10px] font-extrabold tracking-wider text-blue-200 uppercase">Prestige Total</span>
+              <h3 className="text-3xl font-extrabold text-white mt-1">Élite</h3>
+              <div className="flex items-baseline gap-1 mt-4">
+                <span className="text-4xl font-black text-white">999€</span>
+                <span className="text-blue-200 text-xs">/ mois</span>
+              </div>
+            </div>
+            <ul className="space-y-4 my-auto">
+              <li className="flex items-center gap-3 text-white text-sm">
+                <CheckCircle2 className="w-4 h-4 text-white shrink-0" /> Flotte exclusive (Hypercars)
+              </li>
+              <li className="flex items-center gap-3 text-white text-sm">
+                <CheckCircle2 className="w-4 h-4 text-white shrink-0" /> Chauffeur dédié personnel
+              </li>
+              <li className="flex items-center gap-3 text-white text-sm">
+                <CheckCircle2 className="w-4 h-4 text-white shrink-0" /> Réservation instantanée
+              </li>
+              <li className="flex items-center gap-3 text-white text-sm">
+                <CheckCircle2 className="w-4 h-4 text-white shrink-0" /> Accès aux lounges VIP
+              </li>
+            </ul>
+            <Link href="/register?role=driver" className="mt-8">
+              <Button className="w-full rounded-full bg-white hover:bg-zinc-100 text-blue-600 font-bold h-12">
+                S&apos;abonner maintenant
+              </Button>
+            </Link>
+          </Card>
+
+          {/* Pro Plan */}
+          <Card className="glass-card bg-[#09090b] border-zinc-900 p-8 rounded-3xl text-left flex flex-col h-[500px]">
+            <div className="mb-6">
+              <span className="text-[10px] font-extrabold tracking-wider text-zinc-500 uppercase">Affaires</span>
+              <h3 className="text-2xl font-bold text-white mt-1">Pro</h3>
+              <div className="flex items-baseline gap-1 mt-4">
+                <span className="text-3xl font-black text-white">549€</span>
+                <span className="text-zinc-500 text-xs">/ mois</span>
+              </div>
+            </div>
+            <ul className="space-y-4 my-auto">
+              <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" /> Flotte Business Class
+              </li>
+              <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" /> Réservation 4h à l&apos;avance
+              </li>
+              <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" /> Service conciergerie 24/7
+              </li>
+            </ul>
+            <Link href="/register?role=company" className="mt-8">
+              <Button variant="outline" className="w-full rounded-full border-zinc-800 bg-zinc-950 hover:bg-zinc-900 text-white font-bold h-12">
+                Choisir ce plan
+              </Button>
+            </Link>
+          </Card>
+
+        </div>
+      </section>
+
+      {/* 5. BOTTOM CTA BANNER */}
+      <section className="container mx-auto px-4 py-16 max-w-7xl">
+        <div className="relative rounded-3xl overflow-hidden border border-zinc-900 bg-[#0a0a0c] p-12 md:p-20 text-center">
+          <div className="absolute inset-0 z-0 opacity-15">
+            <Image 
+              src="https://images.unsplash.com/photo-1563720223185-11003d516935?q=80&w=2070&auto=format&fit=crop"
+              alt="Porsche Silhouette"
+              fill
+              className="object-cover"
+              unoptimized
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0c] via-transparent to-[#0a0a0c]" />
+          </div>
+          
+          <div className="relative z-10 max-w-xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Prêt pour votre prochain voyage ?</h2>
+            <p className="text-zinc-500 text-sm mt-3 leading-relaxed">
+              Rejoignez le cercle exclusif Wigo et vivez une expérience de mobilité inégalée dès aujourd&apos;hui.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+              <Link href="/register" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 h-12 shadow-lg shadow-blue-600/20">
+                  Démarrer l&apos;aventure
+                </Button>
+              </Link>
+              <Link href="/contact" className="w-full sm:w-auto">
+                <Button variant="outline" className="w-full sm:w-auto rounded-full border-zinc-800 bg-zinc-950 text-white font-bold px-8 h-12 hover:bg-zinc-900">
+                  Nous contacter
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. FOOTER */}
+      <footer className="border-t border-zinc-900 bg-zinc-950/60 backdrop-blur-xl py-12 md:py-16 relative z-10">
          <div className="container mx-auto px-4 max-w-7xl">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+               
+               {/* Brand & Quote */}
                <div className="md:col-span-1">
                   <Link href="/" className="flex items-center gap-2 mb-6">
-                     <span className="text-3xl font-extrabold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">Wigo</span>
+                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-extrabold text-base shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                      W
+                    </div>
+                    <span className="text-xl font-extrabold tracking-wider text-white uppercase">Wigo</span>
                   </Link>
-                  <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
-                     L&apos;excellence en mouvement. La première plateforme SaaS et Marketplace pour la location de véhicules premium et chauffeurs au Maroc.
+                  <p className="text-zinc-500 text-xs leading-relaxed">
+                     La plateforme de mobilité ultra premium pour les particuliers exigeants et les entreprises de prestige.
                   </p>
                </div>
                
+               {/* Plateforme */}
                <div>
-                  <h4 className="font-bold text-white mb-6">Marketplace</h4>
-                  <ul className="space-y-4 text-sm text-zinc-400">
-                     <li><Link href="/cars" className="hover:text-white transition-colors">Véhicules</Link></li>
-                     <li><Link href="/drivers" className="hover:text-white transition-colors">Chauffeurs</Link></li>
-                     <li><Link href="/cities" className="hover:text-white transition-colors">Villes desservies</Link></li>
+                  <h4 className="font-bold text-white text-sm mb-6">Plateforme</h4>
+                  <ul className="space-y-4 text-xs text-zinc-500">
+                     <li><Link href="/" className="hover:text-white transition-colors">La flotte</Link></li>
+                     <li><Link href="/drivers" className="hover:text-white transition-colors">Les Chauffeurs</Link></li>
+                     <li><Link href="/pricing" className="hover:text-white transition-colors">Tarifs abonnements</Link></li>
+                     <li><Link href="/register" className="hover:text-white transition-colors">Affiliations</Link></li>
                   </ul>
                </div>
 
+               {/* Société */}
                <div>
-                  <h4 className="font-bold text-white mb-6">Partenaires</h4>
-                  <ul className="space-y-4 text-sm text-zinc-400">
-                     <li><Link href="/register?role=company" className="hover:text-white transition-colors">Devenir Loueur</Link></li>
-                     <li><Link href="/register?role=driver" className="hover:text-white transition-colors">Devenir Chauffeur</Link></li>
-                     <li><Link href="/pricing" className="hover:text-white transition-colors">Tarifs Abonnements SaaS</Link></li>
+                  <h4 className="font-bold text-white text-sm mb-6">Société</h4>
+                  <ul className="space-y-4 text-xs text-zinc-500">
+                     <li><Link href="/about" className="hover:text-white transition-colors">À propos</Link></li>
+                     <li><Link href="/careers" className="hover:text-white transition-colors">Carrières</Link></li>
+                     <li><Link href="/press" className="hover:text-white transition-colors">Presse</Link></li>
+                     <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
                   </ul>
                </div>
 
+               {/* Newsletter */}
                <div>
-                  <h4 className="font-bold text-white mb-6">Support</h4>
-                  <ul className="space-y-4 text-sm text-zinc-400">
-                     <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
-                     <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
-                     <li><Link href="/terms" className="hover:text-white transition-colors">Conditions Générales</Link></li>
-                     <li><Link href="/privacy" className="hover:text-white transition-colors">Confidentialité</Link></li>
-                  </ul>
+                  <h4 className="font-bold text-white text-sm mb-6">Newsletter</h4>
+                  <p className="text-zinc-500 text-xs mb-4 leading-relaxed">Conservez nos offres exclusives.</p>
+                  <form onSubmit={(e) => e.preventDefault()} className="flex items-center gap-2 max-w-sm">
+                     <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-zinc-900 border border-zinc-800/80 rounded-xl">
+                        <Mail className="w-4 h-4 text-zinc-600" />
+                        <input type="email" placeholder="Votre email" className="bg-transparent border-none outline-none text-xs text-white placeholder-zinc-700 w-full" />
+                     </div>
+                     <Button type="submit" size="sm" className="bg-white hover:bg-zinc-200 text-black font-bold px-4 h-10 rounded-xl">
+                        OK
+                     </Button>
+                  </form>
                </div>
+
             </div>
-            <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-500">
+
+            {/* Bottom Credits */}
+            <div className="pt-8 border-t border-zinc-900 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
                <p>© {new Date().getFullYear()} Wigo Mobility. Tous droits réservés.</p>
                <div className="flex gap-6">
-                  {/* Social icons placeholders */}
-                  <a href="#" className="hover:text-white transition-colors">Facebook</a>
-                  <a href="#" className="hover:text-white transition-colors">Instagram</a>
-                  <a href="#" className="hover:text-white transition-colors">LinkedIn</a>
+                  <Link href="/privacy" className="hover:text-white transition-colors">Confidentialité</Link>
+                  <Link href="/terms" className="hover:text-white transition-colors">Conditions</Link>
+                  <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
                </div>
             </div>
          </div>
       </footer>
+
     </div>
   );
 }
