@@ -1,11 +1,14 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Filter, Search, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { X, Headset } from "lucide-react";
 import { useState, useCallback } from "react";
 
-const MAX_PRICE = 350;
+const BRANDS = ["Tesla", "BMW", "Mercedes", "Audi"];
+const TYPES = ["Berline de Luxe", "SUV Premium", "Sportive"];
+const TRANSMISSIONS = ["Manuelle", "Automatique"];
+const MAX_PRICE = 800;
+const MIN_PRICE = 150;
 
 export default function CarFilters() {
   const router = useRouter();
@@ -14,115 +17,180 @@ export default function CarFilters() {
   const initialMax = parseInt(searchParams.get("maxPrice") || String(MAX_PRICE));
   const [maxPrice, setMaxPrice] = useState(initialMax);
 
-  const handleFuelChange = (fuel: string, checked: boolean) => {
-    const params = new URLSearchParams(searchParams.toString());
-    const currentFuels = params.getAll("fuel");
-
-    if (checked) {
-      if (!currentFuels.includes(fuel)) params.append("fuel", fuel);
-    } else {
-      params.delete("fuel");
-      currentFuels.filter(f => f !== fuel).forEach(f => params.append("fuel", f));
-    }
-
+  const pushParams = (params: URLSearchParams) => {
     router.push(`/cars?${params.toString()}`);
   };
 
+  // Brand filter (pills)
+  const handleBrandToggle = (brand: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const currentBrands = params.getAll("brand");
+    if (currentBrands.includes(brand)) {
+      params.delete("brand");
+      currentBrands.filter(b => b !== brand).forEach(b => params.append("brand", b));
+    } else {
+      params.append("brand", brand);
+    }
+    pushParams(params);
+  };
+
+  // Type filter (radio)
+  const handleTypeChange = (type: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const current = params.get("type");
+    if (current === type) {
+      params.delete("type");
+    } else {
+      params.set("type", type);
+    }
+    pushParams(params);
+  };
+
+  // Transmission filter (pills)
+  const handleTransmissionToggle = (trans: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const current = params.get("transmission");
+    if (current === trans) {
+      params.delete("transmission");
+    } else {
+      params.set("transmission", trans);
+    }
+    pushParams(params);
+  };
+
+  // Price filter
   const handlePriceChange = useCallback((value: number) => {
     setMaxPrice(value);
   }, []);
 
   const applyPriceFilter = () => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set("maxPrice", String(maxPrice));
-    router.push(`/cars?${params.toString()}`);
+    if (maxPrice < MAX_PRICE) {
+      params.set("maxPrice", String(maxPrice));
+    } else {
+      params.delete("maxPrice");
+    }
+    pushParams(params);
   };
 
-  const resetPriceFilter = () => {
+  // Reset all
+  const resetFilters = () => {
     setMaxPrice(MAX_PRICE);
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("maxPrice");
-    router.push(`/cars?${params.toString()}`);
+    router.push("/cars");
   };
 
-  const isFiltered = maxPrice < MAX_PRICE;
+  const selectedBrands = searchParams.getAll("brand");
+  const selectedType = searchParams.get("type");
+  const selectedTransmission = searchParams.get("transmission");
 
   return (
-    <aside className="w-full md:w-64 shrink-0 space-y-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Filter className="w-5 h-5 text-blue-500" />
-        <h2 className="text-xl font-bold">Filtres</h2>
+    <aside className="w-full md:w-56 shrink-0 space-y-7">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-bold text-white">Filtres</h2>
+        <button
+          onClick={resetFilters}
+          className="text-xs text-zinc-500 hover:text-blue-400 transition-colors"
+        >
+          Réinitialiser
+        </button>
       </div>
 
+      {/* Marque */}
       <div className="space-y-3">
-        <h3 className="font-medium text-zinc-400 uppercase text-xs tracking-wider">Recherche</h3>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-          <Input placeholder="Modèle, marque..." className="pl-9 bg-zinc-900 border-zinc-800 text-white placeholder-zinc-500 rounded-xl" />
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        <h3 className="font-medium text-zinc-400 uppercase text-xs tracking-wider">Carburant</h3>
-        <div className="space-y-2">
-          {["Essence", "Diesel", "Électrique", "Hybride"].map(cat => {
-            const isChecked = searchParams.getAll("fuel").includes(cat);
+        <h3 className="font-semibold text-zinc-500 uppercase text-[10px] tracking-widest">Marque</h3>
+        <div className="flex flex-wrap gap-2">
+          {BRANDS.map(brand => {
+            const isActive = selectedBrands.includes(brand);
             return (
-              <label key={cat} className="flex items-center gap-3 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  className="peer sr-only"
-                  checked={isChecked}
-                  onChange={(e) => handleFuelChange(cat, e.target.checked)}
-                />
-                <div className="w-5 h-5 rounded border border-zinc-700 bg-zinc-900 group-hover:border-blue-500 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition-colors flex items-center justify-center [&>svg]:hidden peer-checked:[&>svg]:block">
-                  <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <span className="text-zinc-300 group-hover:text-white transition-colors">{cat}</span>
-              </label>
+              <button
+                key={brand}
+                onClick={() => handleBrandToggle(brand)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${
+                  isActive
+                    ? "bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/20"
+                    : "bg-zinc-900/80 text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
+                }`}
+              >
+                {brand}
+              </button>
             );
           })}
         </div>
       </div>
 
-      <div className="space-y-4">
+      {/* Prix / Jour */}
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-medium text-zinc-400 uppercase text-xs tracking-wider">Prix Max (€/Jour)</h3>
-          {isFiltered && (
-            <button onClick={resetPriceFilter} className="text-zinc-500 hover:text-white transition-colors">
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
+          <h3 className="font-semibold text-zinc-500 uppercase text-[10px] tracking-widest">Prix / Jour</h3>
+          <span className="text-xs text-zinc-400 font-medium">€{MIN_PRICE} – €{maxPrice}</span>
         </div>
-
-        {/* Affichage de la valeur actuelle */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-zinc-500">0 €</span>
-          <span className={`text-sm font-bold ${isFiltered ? "text-blue-400" : "text-zinc-400"}`}>
-            {maxPrice < MAX_PRICE ? `${maxPrice} €` : "Tous les prix"}
-          </span>
-        </div>
-
-        {/* Slider */}
         <input
           type="range"
-          min={0}
+          min={MIN_PRICE}
           max={MAX_PRICE}
           step={10}
           value={maxPrice}
           onChange={(e) => handlePriceChange(parseInt(e.target.value))}
           onMouseUp={applyPriceFilter}
           onTouchEnd={applyPriceFilter}
-          className="w-full h-2 rounded-full appearance-none cursor-pointer bg-zinc-800 accent-blue-500"
+          className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-zinc-800 accent-blue-500"
         />
+      </div>
 
-        <div className="flex justify-between text-xs text-zinc-600">
-          <span>0 €</span>
-          <span>{MAX_PRICE} €+</span>
+      {/* Type de Véhicule */}
+      <div className="space-y-3">
+        <h3 className="font-semibold text-zinc-500 uppercase text-[10px] tracking-widest">Type de Véhicule</h3>
+        <div className="space-y-2">
+          {TYPES.map(type => {
+            const isActive = selectedType === type;
+            return (
+              <label key={type} className="flex items-center gap-3 cursor-pointer group">
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                  isActive ? "border-blue-500" : "border-zinc-700 group-hover:border-zinc-500"
+                }`}>
+                  {isActive && <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />}
+                </div>
+                <span
+                  className={`text-sm transition-colors ${isActive ? "text-white font-medium" : "text-zinc-400 group-hover:text-white"}`}
+                  onClick={() => handleTypeChange(type)}
+                >
+                  {type}
+                </span>
+              </label>
+            );
+          })}
         </div>
       </div>
+
+      {/* Transmission */}
+      <div className="space-y-3">
+        <h3 className="font-semibold text-zinc-500 uppercase text-[10px] tracking-widest">Transmission</h3>
+        <div className="flex gap-2">
+          {TRANSMISSIONS.map(trans => {
+            const isActive = selectedTransmission === trans;
+            return (
+              <button
+                key={trans}
+                onClick={() => handleTransmissionToggle(trans)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${
+                  isActive
+                    ? "bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/20"
+                    : "bg-zinc-900/80 text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white"
+                }`}
+              >
+                {trans}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Assistance Elite */}
+      <button className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-colors shadow-lg shadow-blue-600/20">
+        <Headset className="w-4 h-4" />
+        Assistance Elite
+      </button>
     </aside>
   );
 }

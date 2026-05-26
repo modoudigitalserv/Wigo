@@ -94,7 +94,7 @@ export default async function AdminDriversPage() {
                       <div>
                         <h3 className="font-bold text-white flex items-center gap-2">
                           {owner?.full_name || "Chauffeur Anonyme"}
-                          {driver.is_verified && <ShieldCheck className="w-4 h-4 text-emerald-500" title="Profil vérifié (KYC)" />}
+                          {driver.is_verified && <ShieldCheck className="w-4 h-4 text-emerald-500" />}
                         </h3>
                         <div className="flex items-center gap-4 mt-1 text-sm text-zinc-400">
                           <span className="flex items-center gap-1">📍 {driver.city || "Non spécifiée"}</span>
