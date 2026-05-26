@@ -6,6 +6,7 @@ import { createClient } from "@/lib/server";
 import { redirect } from "next/navigation";
 import { signout } from "@/app/login/actions";
 import DashboardChart from "./DashboardChart";
+import DashboardRealtimeListener from "@/components/DashboardRealtimeListener";
 
 const STATUS_STYLES: Record<string, string> = {
   confirmed: "text-zinc-300 border-zinc-600 bg-zinc-800/50",
@@ -115,6 +116,7 @@ export default async function DashboardPage() {
 
         {/* Main Content */}
         <main className="flex-1 p-6 md:p-10 overflow-y-auto">
+          <DashboardRealtimeListener role="company" ownerId={company?.id} />
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
             <div className="flex items-center gap-4">
@@ -529,6 +531,7 @@ export default async function DashboardPage() {
 
         {/* Main Content Driver */}
         <main className="flex-1 p-6 md:p-10 overflow-y-auto">
+          <DashboardRealtimeListener role="driver" ownerId={driver?.id} />
           <div className="flex justify-between items-center mb-10">
             <div>
               <h1 className="text-3xl font-extrabold tracking-tight text-white">Tableau de Bord Chauffeur</h1>
@@ -596,6 +599,7 @@ export default async function DashboardPage() {
       </aside>
 
       <main className="flex-1 p-6 md:p-10 overflow-y-auto">
+        <DashboardRealtimeListener role={role as any} ownerId={user.sub} />
         <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Bonjour, {displayName.split(" ")[0]} 👋</h1>
         <p className="text-zinc-500 text-sm mb-10">Interface mise à jour ({role}).</p>
       </main>
