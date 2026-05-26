@@ -26,7 +26,7 @@ export default async function Home() {
     supabase.from("drivers").select("*", { count: "exact", head: true }).eq("is_verified", true),
   ]);
 
-  return <LandingClient cars={featuredCars} totalCars={totalCars ?? "500+"} totalDrivers={totalDrivers ?? "200+"} />;
+  return <LandingClient cars={featuredCars} />;
 }
 
 
