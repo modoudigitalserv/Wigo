@@ -1,23 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Search, Star, Filter, SlidersHorizontal, CheckCircle2, MessageSquare } from "lucide-react";
+import { Search, Star, Filter, SlidersHorizontal, CheckCircle2, MessageSquare, MapPin, ChevronRight, ShieldCheck } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { createClient } from "@/lib/server";
+import DriverFilters from "./DriverFilters";
 
 const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1974&auto=format&fit=crop";
-
-const MOCK_DRIVERS = [
-  { id: "1", full_name: "Mamadou N.", experience_years: 8, rating_average: 4.9, total_missions: 342, daily_rate: 80, languages: ["FR", "EN", "WO"], photo_url: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1974&auto=format&fit=crop", is_verified: true },
-  { id: "2", full_name: "Cheikh T.", experience_years: 12, rating_average: 5.0, total_missions: 890, daily_rate: 120, languages: ["FR", "EN"], photo_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop", is_verified: true },
-  { id: "3", full_name: "Ibrahima S.", experience_years: 5, rating_average: 4.8, total_missions: 156, daily_rate: 60, languages: ["FR", "WO"], photo_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop", is_verified: true },
-  { id: "4", full_name: "Abdoulaye D.", experience_years: 15, rating_average: 5.0, total_missions: 1205, daily_rate: 150, languages: ["FR", "EN", "AR"], photo_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop", is_verified: true },
-  { id: "5", full_name: "Jean D.", experience_years: 4, rating_average: 4.5, total_missions: 80, daily_rate: 55, languages: ["FR"], photo_url: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=1974&auto=format&fit=crop", is_verified: true },
-  { id: "6", full_name: "John S.", experience_years: 6, rating_average: 4.7, total_missions: 120, daily_rate: 90, languages: ["EN"], photo_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop", is_verified: true },
-  { id: "7", full_name: "Youssef B.", experience_years: 10, rating_average: 4.9, total_missions: 450, daily_rate: 75, languages: ["AR"], photo_url: "https://images.unsplash.com/photo-1566492031523-87d28ebd9cb0?q=80&w=1974&auto=format&fit=crop", is_verified: true },
-];
-
-import DriverFilters from "./DriverFilters";
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -35,107 +24,156 @@ export default async function DriversPage(props: Props) {
 
   if (searchParams.lang) {
     const langs = Array.isArray(searchParams.lang) ? searchParams.lang : [searchParams.lang];
-    // On convertit les valeurs du filtre UI vers celles en base (Français -> FR, Anglais -> EN, Darija -> AR/Darija)
     const dbLangs = langs.map(l => l === "Français" ? "FR" : l === "Anglais" ? "EN" : l === "Darija" ? "AR" : l);
-    // Note: Supabase `.contains` nécessite que le tableau de langues corresponde.
-    query = query.contains("languages", dbLangs);
+    if (dbLangs.length > 0) {
+      query = query.contains("languages", [dbLangs[0]]);
+    }
+  }
+  
+  if (searchParams.sort) {
+    if (searchParams.sort === "Note") query = query.order("rating_average", { ascending: false });
+    else if (searchParams.sort === "Tarif") query = query.order("daily_rate", { ascending: true });
+    else if (searchParams.sort === "Expérience") query = query.order("experience_years", { ascending: false });
+  } else {
+    query = query.order("rating_average", { ascending: false });
   }
 
-  const { data: dbDrivers } = await query.order("rating_average", { ascending: false });
-
-  let drivers = dbDrivers && dbDrivers.length > 0 ? dbDrivers : MOCK_DRIVERS;
-
-  if (searchParams.lang && (!dbDrivers || dbDrivers.length === 0)) {
-    const langs = Array.isArray(searchParams.lang) ? searchParams.lang : [searchParams.lang];
-    const dbLangs = langs.map(l => l === "Français" ? "FR" : l === "Anglais" ? "EN" : l === "Darija" ? "AR" : l);
-    drivers = MOCK_DRIVERS.filter(d => dbLangs.every(l => d.languages.includes(l)));
-  }
+  const { data: dbDrivers } = await query;
+  const driversToDisplay = dbDrivers || [];
 
   return (
-    <div className="flex flex-col min-h-screen bg-black text-zinc-50 font-sans pb-24 md:pb-0 pt-6">
-      <div className="container mx-auto px-4 max-w-7xl flex flex-col md:flex-row gap-8">
-        
-        <DriverFilters />
-
-        {/* Main Content */}
-        <main className="flex-1">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <div>
-              <h1 className="text-3xl font-bold">Chauffeurs Professionnels</h1>
-              <p className="text-sm text-zinc-500 mt-1">{drivers.length} chauffeur{drivers.length > 1 ? "s" : ""} disponible{drivers.length > 1 ? "s" : ""}</p>
+    <div className="flex flex-col min-h-screen bg-[#070708] text-zinc-100 font-sans">
+      
+      {/* Header Area */}
+      <section className="pt-32 pb-10 px-6 max-w-7xl mx-auto w-full">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
+              Chauffeurs <span className="bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">Élite</span>
+            </h1>
+            <p className="text-zinc-400 text-lg max-w-xl">
+              Nos chauffeurs privés sont rigoureusement sélectionnés pour vous offrir un service d'excellence, discret et professionnel.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="bg-[#121217] border border-zinc-800/60 rounded-xl flex items-center px-4 py-2">
+              <MapPin className="w-4 h-4 text-blue-500 mr-2" />
+              <input type="text" placeholder="Paris, France" className="bg-transparent border-none outline-none text-sm text-white w-32 placeholder-zinc-500" />
             </div>
-            <Button variant="outline" className="border-zinc-800 text-zinc-300 rounded-full">
-              <SlidersHorizontal className="w-4 h-4 mr-2" /> Trier par: Note globale
+            <Button className="bg-blue-600 hover:bg-blue-500 text-white rounded-xl h-10 px-6 font-bold shadow-lg shadow-blue-600/20">
+              <Search className="w-4 h-4" />
             </Button>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
-            {drivers.map((driver) => {
-              const photo = (driver as any).photo_url || PLACEHOLDER_IMG;
-              const name = (driver as any).profiles?.full_name || (driver as any).full_name || "Chauffeur";
-              const exp = `${(driver as any).experience_years} ans`;
-              const rating = (driver as any).rating_average || 0;
-              const trips = (driver as any).total_missions || 0;
-              const price = (driver as any).daily_rate;
-              const langs = Array.isArray((driver as any).languages)
-                ? (driver as any).languages.join(", ")
-                : (driver as any).languages || "FR";
+        {/* Filters and List wrapper */}
+        <div className="flex flex-col lg:flex-row gap-8">
+          
+          {/* Filters Sidebar */}
+          <aside className="w-full lg:w-72 shrink-0">
+            <div className="sticky top-24">
+              <div className="bg-[#121217] border border-zinc-800/60 rounded-3xl p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-sm font-bold text-white uppercase tracking-widest">Filtres</h2>
+                  <SlidersHorizontal className="w-4 h-4 text-zinc-500" />
+                </div>
+                <DriverFilters />
+              </div>
+            </div>
+          </aside>
 
-              return (
-                <Card key={driver.id} className="glass-card overflow-hidden border-zinc-800/50 hover:border-zinc-700 transition-colors">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="relative w-24 h-24 rounded-full overflow-hidden shrink-0 border-2 border-zinc-800">
-                        <Image src={photo} alt={name || "Photo du chauffeur"} fill className="object-cover" unoptimized />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                              {name}
-                              {(driver as any).is_verified && <CheckCircle2 className="w-4 h-4 text-blue-500" />}
-                            </h3>
-                            <div className="flex items-center gap-1 mt-1">
-                              {rating > 0 && <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />}
-                              {rating > 0 && <span className="font-bold text-white">{rating.toFixed(1)}</span>}
-                              <span className="text-zinc-500 text-sm">({trips} missions)</span>
+          {/* Drivers Grid */}
+          <main className="flex-1">
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-sm text-zinc-500 font-medium">
+                <span className="text-white font-bold">{driversToDisplay.length}</span> chauffeurs disponibles
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {driversToDisplay.map((driver: any) => {
+                const imgUrl = driver.photo_url || PLACEHOLDER_IMG;
+                const name = driver.profiles?.full_name || "Chauffeur Wigo";
+                const langs = driver.languages || ["FR", "EN"];
+                
+                return (
+                  <Card key={driver.id} className="bg-[#121217] border border-zinc-800/60 overflow-hidden rounded-3xl group hover:border-blue-500/30 transition-colors">
+                    <CardContent className="p-0">
+                      <div className="p-6">
+                        <div className="flex gap-4">
+                          <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-zinc-800 shrink-0">
+                            <Image 
+                              src={imgUrl} 
+                              alt={name} 
+                              fill 
+                              className="object-cover group-hover:scale-110 transition-transform duration-500" 
+                              unoptimized
+                            />
+                            {driver.is_verified && (
+                              <div className="absolute bottom-0 right-0 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center border-2 border-[#121217]">
+                                <ShieldCheck className="w-3 h-3 text-white" />
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h3 className="text-lg font-bold text-white">{name}</h3>
+                                <p className="text-xs text-blue-400 font-extrabold uppercase tracking-widest mt-0.5">{driver.experience_years} ans exp.</p>
+                              </div>
+                              <div className="flex items-center gap-1 bg-zinc-900 border border-zinc-800 px-2 py-1 rounded-lg">
+                                <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+                                <span className="text-xs font-bold text-white">{driver.rating_average || "N/A"}</span>
+                              </div>
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-2 mt-4">
+                              {langs.map((lang: string) => (
+                                <span key={lang} className="px-2 py-1 rounded border border-zinc-800 bg-zinc-900/50 text-[10px] font-bold text-zinc-400 uppercase">
+                                  {lang}
+                                </span>
+                              ))}
                             </div>
                           </div>
-                          <div className="text-right">
-                            <p className="text-xl font-bold text-blue-400">{price} €</p>
-                            <p className="text-[10px] text-zinc-500 uppercase">/ jour</p>
-                          </div>
                         </div>
-
-                        <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
-                          <div className="bg-zinc-900/50 rounded-lg p-2 border border-zinc-800/50">
-                            <span className="text-zinc-500 text-xs block mb-1">Expérience</span>
-                            <span className="font-semibold text-zinc-200">{exp}</span>
+                        
+                        <div className="mt-6 pt-6 border-t border-zinc-800/60 flex items-center justify-between">
+                          <div>
+                            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-0.5">Tarif journalier</p>
+                            <p className="text-2xl font-black text-white">{driver.daily_rate}€</p>
                           </div>
-                          <div className="bg-zinc-900/50 rounded-lg p-2 border border-zinc-800/50">
-                            <span className="text-zinc-500 text-xs block mb-1">Langues</span>
-                            <span className="font-semibold text-zinc-200">{langs}</span>
-                          </div>
-                        </div>
-
-                        <div className="mt-6 flex gap-3">
-                          <Button className="flex-1 bg-white text-black hover:bg-zinc-200 rounded-full font-semibold">
-                            Réserver
-                          </Button>
-                          <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:text-white rounded-full px-4">
-                            <MessageSquare className="w-4 h-4" />
-                          </Button>
+                          <Link href="#">
+                            <Button className="bg-white hover:bg-zinc-200 text-black rounded-xl font-bold h-10 px-6">
+                              Réserver
+                            </Button>
+                          </Link>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </main>
-      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {driversToDisplay.length === 0 && (
+              <div className="text-center py-20 bg-[#121217] border border-zinc-800/60 rounded-3xl">
+                <ShieldCheck className="w-12 h-12 text-zinc-700 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">Aucun chauffeur trouvé</h3>
+                <p className="text-zinc-500">Essayez de modifier vos critères de recherche.</p>
+              </div>
+            )}
+            
+            {driversToDisplay.length > 0 && (
+              <div className="mt-12 flex justify-center">
+                <Button variant="outline" className="border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-full px-8 h-12 font-bold uppercase tracking-widest text-xs">
+                  Charger plus de profils
+                </Button>
+              </div>
+            )}
+          </main>
+        </div>
+      </section>
     </div>
   );
 }
-

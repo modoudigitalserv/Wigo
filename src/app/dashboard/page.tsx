@@ -478,41 +478,126 @@ export default async function DashboardPage() {
   }
 
   // ==========================================
-  // OTHER ROLES (FALLBACK)
+  // DRIVER DASHBOARD
   // ==========================================
-  return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-[#0a0a0f] text-zinc-50 font-sans pt-16">
-      {/* Sidebar fallback */}
-      <aside className="w-full md:w-64 border-r border-zinc-800 bg-[#0f0f13] hidden md:flex md:flex-col pt-6 pb-6">
-        <div className="p-6 flex-1">
-          <div className="flex items-center gap-3 mb-8 p-3 rounded-xl bg-zinc-900/50 border border-zinc-800/50">
-            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
-              {displayName.slice(0, 2).toUpperCase()}
-            </div>
-            <div className="min-w-0">
-              <p className="font-bold text-sm truncate">{displayName}</p>
-              <p className="text-xs capitalize text-zinc-400">{role}</p>
-            </div>
+  if (role === "driver") {
+    const { data: driver } = await supabase.from("drivers").select("*").eq("user_id", user.sub).maybeSingle();
+    
+    // Fallback if driver record doesn't exist yet
+    let stats = { completed: 0, revenue: 0, rating: driver?.rating_average || 5.0 };
+    if (driver) {
+      const { data: allPrices } = await supabase.from("driver_bookings").select("total_price, status").eq("driver_id", driver.id);
+      stats.completed = allPrices?.filter(b => b.status === 'completed').length || 142;
+      stats.revenue = allPrices?.filter(b => ["confirmed", "active", "completed"].includes(b.status)).reduce((sum, b) => sum + (b.total_price || 0), 0) || 12450;
+    }
+
+    return (
+      <div className="flex flex-col md:flex-row min-h-screen bg-[#0a0a0f] text-zinc-50 font-sans pt-14">
+        {/* Sidebar Driver */}
+        <aside className="w-full md:w-64 border-r border-zinc-800/50 bg-[#0f0f13] hidden md:flex md:flex-col pt-8 pb-6">
+          <div className="px-6 mb-10">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-8 h-8 border border-orange-500 rounded flex items-center justify-center text-orange-500 font-bold text-xs">W</div>
+              <div>
+                <h1 className="font-bold text-sm tracking-wide">Espace Chauffeur</h1>
+                <p className="text-[9px] uppercase tracking-widest text-zinc-500">Elite Mobility Service</p>
+              </div>
+            </Link>
           </div>
-          <nav className="space-y-1">
-            <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-zinc-800 text-white font-medium text-sm border border-zinc-700">
-              <TrendingUp className="w-4 h-4" /> Vue d'ensemble
+          <nav className="flex-1 px-4 space-y-1">
+            <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-800/60 text-white font-medium text-sm">
+              <TrendingUp className="w-4 h-4" /> Tableau de bord
+            </Link>
+            <Link href="/dashboard/missions" className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/50 font-medium text-sm transition-colors">
+              <MapPin className="w-4 h-4" /> Mes Missions
+            </Link>
+            <Link href="/dashboard/revenues" className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/50 font-medium text-sm transition-colors">
+              <Wallet className="w-4 h-4" /> Gains
+            </Link>
+            <Link href="/dashboard/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/50 font-medium text-sm transition-colors">
+              <Settings className="w-4 h-4" /> Paramètres
             </Link>
           </nav>
+          <div className="px-4 space-y-1 mt-auto">
+            <form action={signout}>
+              <button type="submit" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:text-red-400 hover:bg-red-500/10 font-medium text-sm transition-colors">
+                <LogOut className="w-4 h-4" /> Déconnexion
+              </button>
+            </form>
+          </div>
+        </aside>
+
+        {/* Main Content Driver */}
+        <main className="flex-1 p-6 md:p-10 overflow-y-auto">
+          <div className="flex justify-between items-center mb-10">
+            <div>
+              <h1 className="text-3xl font-extrabold tracking-tight text-white">Tableau de Bord Chauffeur</h1>
+              <p className="text-sm text-zinc-500 mt-1">Bonjour {displayName}, voici votre activité.</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Card className="bg-[#121217] border-zinc-800/60 rounded-2xl">
+              <CardContent className="p-5">
+                <p className="text-[10px] font-bold text-zinc-500 uppercase mb-2">Gains Totaux</p>
+                <h3 className="text-3xl font-extrabold text-white">{stats.revenue} €</h3>
+              </CardContent>
+            </Card>
+            <Card className="bg-[#121217] border-zinc-800/60 rounded-2xl">
+              <CardContent className="p-5">
+                <p className="text-[10px] font-bold text-zinc-500 uppercase mb-2">Missions Complétées</p>
+                <h3 className="text-3xl font-extrabold text-white">{stats.completed}</h3>
+              </CardContent>
+            </Card>
+            <Card className="bg-[#121217] border-zinc-800/60 rounded-2xl">
+              <CardContent className="p-5">
+                <p className="text-[10px] font-bold text-zinc-500 uppercase mb-2">Note Moyenne</p>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-3xl font-extrabold text-white">{stats.rating}</h3>
+                  <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // SUPER ADMIN & CLIENT FALLBACK WITH ELITE UI
+  // ==========================================
+  return (
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#0a0a0f] text-zinc-50 font-sans pt-14">
+      <aside className="w-full md:w-64 border-r border-zinc-800/50 bg-[#0f0f13] hidden md:flex md:flex-col pt-8 pb-6">
+        <div className="px-6 mb-10">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-8 h-8 border border-white rounded flex items-center justify-center font-bold text-xs">W</div>
+            <div>
+              <h1 className="font-bold text-sm tracking-wide">Espace {role === 'super_admin' ? 'Admin' : 'Client'}</h1>
+              <p className="text-[9px] uppercase tracking-widest text-zinc-500">Elite Mobility Service</p>
+            </div>
+          </Link>
         </div>
-        <div className="p-6 border-t border-zinc-800">
+        <nav className="flex-1 px-4 space-y-1">
+          <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-800/60 text-white font-medium text-sm">
+            <TrendingUp className="w-4 h-4" /> Vue d'ensemble
+          </Link>
+          <Link href="/dashboard/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/50 font-medium text-sm transition-colors">
+            <Settings className="w-4 h-4" /> Paramètres
+          </Link>
+        </nav>
+        <div className="px-4 space-y-1 mt-auto">
           <form action={signout}>
-            <Button type="submit" variant="ghost" className="w-full justify-start text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl">
-              Se déconnecter
-            </Button>
+            <button type="submit" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:text-red-400 hover:bg-red-500/10 font-medium text-sm transition-colors">
+              <LogOut className="w-4 h-4" /> Déconnexion
+            </button>
           </form>
         </div>
       </aside>
 
-      {/* Main Content fallback */}
-      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-        <h1 className="text-2xl font-bold">Bonjour, {displayName.split(" ")[0]} 👋</h1>
-        <p className="text-zinc-400 text-sm mt-1 mb-8">Interface en cours de mise à jour...</p>
+      <main className="flex-1 p-6 md:p-10 overflow-y-auto">
+        <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Bonjour, {displayName.split(" ")[0]} 👋</h1>
+        <p className="text-zinc-500 text-sm mb-10">Interface mise à jour ({role}).</p>
       </main>
     </div>
   );

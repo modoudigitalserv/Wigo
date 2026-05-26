@@ -21,7 +21,7 @@ export default async function NewCarPage() {
     redirect("/dashboard");
   }
   return (
-    <div className="min-h-screen bg-black text-zinc-50 pt-24 pb-12 px-4 md:px-8">
+    <div className="min-h-screen bg-[#0a0a0f] text-zinc-50 pt-24 pb-12 px-4 md:px-8">
       <div className="max-w-4xl mx-auto">
         
         {/* Header */}
@@ -39,7 +39,7 @@ export default async function NewCarPage() {
 
         {/* Formulaire */}
         <form action={addCar} className="space-y-8">
-          <Card className="glass-card border-zinc-800/50 bg-zinc-950/80">
+          <Card className="glass-card border-zinc-800/60 bg-[#121217]">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CarFront className="w-5 h-5 text-blue-500" /> Informations générales
@@ -73,7 +73,7 @@ export default async function NewCarPage() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card border-zinc-800/50 bg-zinc-950/80">
+          <Card className="glass-card border-zinc-800/60 bg-[#121217]">
             <CardHeader>
               <CardTitle>Caractéristiques & Tarifs</CardTitle>
               <CardDescription className="text-zinc-400">
@@ -118,7 +118,7 @@ export default async function NewCarPage() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card border-zinc-800/50 bg-zinc-950/80">
+          <Card className="glass-card border-zinc-800/60 bg-[#121217]">
             <CardHeader>
               <CardTitle>Photo du véhicule</CardTitle>
               <CardDescription className="text-zinc-400">

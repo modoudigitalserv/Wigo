@@ -14,7 +14,7 @@ export default async function RegisterPage({ searchParams }: Props) {
   const params = await searchParams;
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden px-4">
+    <div className="min-h-screen bg-[#070708] flex items-center justify-center relative overflow-hidden px-4">
       {/* Background */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -47,7 +47,7 @@ export default async function RegisterPage({ searchParams }: Props) {
           )}
 
           <form action={signup}>
-            <div className="glass-card p-8 border-zinc-800/50 space-y-5 bg-zinc-950/80">
+            <div className="glass-card p-8 border-zinc-800/60 space-y-5 bg-[#121217]">
               
               {/* Role selector */}
               <div className="space-y-2">

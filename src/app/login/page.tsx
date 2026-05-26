@@ -14,7 +14,7 @@ export default async function LoginPage({ searchParams }: Props) {
   const params = await searchParams;
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden px-4">
+    <div className="min-h-screen bg-[#070708] flex items-center justify-center relative overflow-hidden px-4">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -53,7 +53,7 @@ export default async function LoginPage({ searchParams }: Props) {
           )}
 
           <form action={login}>
-            <div className="glass-card p-8 border-zinc-800/50 space-y-6 bg-zinc-950/80">
+            <div className="glass-card p-8 border-zinc-800/60 space-y-6 bg-[#121217]">
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-zinc-300">Adresse Email</Label>
