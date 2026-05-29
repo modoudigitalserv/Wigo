@@ -77,9 +77,9 @@ export default async function DashboardPage() {
           </div>
 
           <div className="px-6 mb-8">
-            <Link href="/dashboard/missions/new">
+            <Link href="/dashboard/cars/new">
               <Button className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-full font-semibold shadow-lg shadow-blue-600/20">
-                <Plus className="w-4 h-4 mr-2" /> Nouvelle Mission
+                <Plus className="w-4 h-4 mr-2" /> Nouveau Véhicule
               </Button>
             </Link>
           </div>
