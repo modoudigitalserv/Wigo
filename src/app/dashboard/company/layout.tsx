@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { signout } from "@/app/login/actions";
 import { createClient } from "@/lib/server";
 import { redirect } from "next/navigation";
+import DashboardRealtimeListener from "@/components/DashboardRealtimeListener";
 
 export default async function CompanyDashboardLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
@@ -20,6 +21,12 @@ export default async function CompanyDashboardLayout({ children }: { children: R
     .single();
 
   const displayName = profile?.full_name || user.email || "Utilisateur";
+
+  const { data: company } = await supabase
+    .from("companies")
+    .select("id")
+    .eq("user_id", user.sub)
+    .maybeSingle();
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[#0a0a0f] text-zinc-50 font-sans pt-14">
@@ -75,6 +82,7 @@ export default async function CompanyDashboardLayout({ children }: { children: R
 
       {/* Main Content */}
       <main className="flex-1 p-6 md:p-10 overflow-y-auto">
+        <DashboardRealtimeListener role="company" ownerId={company?.id} />
         {/* Header commun */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
           <div className="flex items-center gap-4">
