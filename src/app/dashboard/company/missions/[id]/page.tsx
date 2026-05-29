@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, User, Phone, MapPin, Car, CreditCard } from "lucide-react";
 import Image from "next/image";
+import { updateMissionStatus } from "./actions";
 
 const STATUS_STYLES: Record<string, string> = {
   confirmed: "text-zinc-300 border-zinc-600 bg-zinc-800/50",
@@ -57,6 +58,9 @@ export default async function MissionDetailsPage({ params }: { params: { id: str
 
   const car = mission.cars;
   const image = car?.car_images?.[0]?.image_url || "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=2070&auto=format&fit=crop";
+
+  const acceptAction = updateMissionStatus.bind(null, mission.id, "confirmed");
+  const rejectAction = updateMissionStatus.bind(null, mission.id, "cancelled");
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-12">
@@ -157,8 +161,12 @@ export default async function MissionDetailsPage({ params }: { params: { id: str
             <CardContent className="space-y-3">
               {mission.status === "pending" ? (
                 <>
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl">Accepter la mission</Button>
-                  <Button variant="outline" className="w-full border-zinc-700 text-zinc-300 hover:bg-zinc-800 rounded-xl">Refuser</Button>
+                  <form action={acceptAction}>
+                    <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl">Accepter la mission</Button>
+                  </form>
+                  <form action={rejectAction}>
+                    <Button type="submit" variant="outline" className="w-full border-zinc-700 text-zinc-300 hover:bg-zinc-800 rounded-xl">Refuser</Button>
+                  </form>
                 </>
               ) : (
                 <p className="text-sm text-zinc-500">Aucune action requise pour le moment. La mission est <b>{STATUS_LABELS[mission.status]?.toLowerCase()}</b>.</p>
