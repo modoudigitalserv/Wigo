@@ -12,6 +12,7 @@ const HERO_BG = "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?q=
 const TESLA_IMG = "https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=2070&auto=format&fit=crop";
 const RANGE_IMG = "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?q=80&w=2070&auto=format&fit=crop";
 const MERCEDES_IMG = "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=2070&auto=format&fit=crop";
+const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=2070&auto=format&fit=crop";
 
 const DRIVERS = [
   {
@@ -287,7 +288,61 @@ export default function LandingClient({ cars }: { cars: any[] }) {
         </div>
       </section>
 
-      {/* 4. NOS PLANS PRIVILEGES */}
+      {/* 4. CATALOGUE CENTRAL */}
+      <section className="container mx-auto px-4 py-20 max-w-7xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
+          <div>
+            <h2 className="text-3xl font-bold text-white tracking-tight">Catalogue centralisé</h2>
+            <p className="text-zinc-500 mt-2 text-sm max-w-2xl">
+              Découvrez l&apos;offre complète de véhicules disponibles sur la plateforme, avec ou sans chauffeur, pour toutes les occasions.
+            </p>
+          </div>
+          <Link href="/cars" className="text-sm font-semibold text-blue-400 hover:text-white">
+            Parcourir la flotte complète
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {cars.map((car) => {
+            const primaryImage = car.car_images?.[0]?.image_url || PLACEHOLDER_IMG;
+            const name = `${car.brand || "Véhicule"} ${car.model || "Premium"}`;
+            const price = car.price_day || 0;
+            const city = car.city || "Localisation indisponible";
+            const rating = car.rating_average || 4.5;
+            const driverLabel = car.has_driver ? "Avec chauffeur" : "Sans chauffeur";
+
+            return (
+              <Card key={car.id} className="overflow-hidden rounded-3xl bg-zinc-950/90 border border-zinc-800/60 hover:border-blue-500/40 transition-all duration-300">
+                <div className="relative h-48 bg-zinc-900">
+                  <Image src={primaryImage} alt={name} fill className="object-cover" unoptimized />
+                </div>
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between gap-4 mb-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-widest text-blue-400 font-bold">{driverLabel}</p>
+                      <h3 className="text-lg font-bold text-white mt-2">{name}</h3>
+                    </div>
+                    <span className="text-sm text-zinc-400">{rating.toFixed(1)} ★</span>
+                  </div>
+
+                  <p className="text-sm text-zinc-400 mb-4">{city}</p>
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-2xl font-extrabold text-white">{price}€</p>
+                      <span className="text-xs text-zinc-500 uppercase tracking-widest">par jour</span>
+                    </div>
+                    <Link href={`/cars/${car.id}`} className="rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-500 transition-colors">
+                      Voir
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 5. NOS PLANS PRIVILEGES */}
       <section className="container mx-auto px-4 py-20 max-w-7xl text-center">
         <h2 className="text-3xl font-bold text-white tracking-tight">Nos Plans Privilèges</h2>
         <p className="text-zinc-500 mt-2 max-w-lg mx-auto text-sm">

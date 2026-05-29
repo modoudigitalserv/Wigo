@@ -88,7 +88,7 @@ export default async function DashboardPage() {
             <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-800/60 text-white font-medium text-sm">
               <TrendingUp className="w-4 h-4" /> Tableau de bord
             </Link>
-            <Link href="/dashboard/bookings" className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/50 font-medium text-sm transition-colors">
+            <Link href="/dashboard/company/missions" className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/50 font-medium text-sm transition-colors">
               <Car className="w-4 h-4" /> Missions
             </Link>
             <Link href="/dashboard/cars" className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/50 font-medium text-sm transition-colors">
