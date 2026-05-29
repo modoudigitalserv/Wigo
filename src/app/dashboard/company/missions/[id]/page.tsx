@@ -35,14 +35,12 @@ export default async function MissionDetailsPage({ params }: { params: { id: str
     .eq("user_id", user.sub)
     .maybeSingle();
 
-  if (!company) redirect("/dashboard");
-
-  const { data: mission } = await supabase
+  const { data: mission } = company ? await supabase
     .from("bookings")
     .select("*, cars(*, car_images(image_url)), customer:profiles!bookings_customer_id_fkey(full_name, phone)")
     .eq("id", params.id)
     .eq("company_id", company.id)
-    .maybeSingle();
+    .maybeSingle() : { data: null };
 
   if (!mission) {
     return (

@@ -33,15 +33,11 @@ export default async function CompanyMissionsPage() {
     .eq("user_id", user.sub)
     .maybeSingle();
 
-  if (!company) {
-    return <div className="text-zinc-400">Aucune entreprise associée.</div>;
-  }
-
-  const { data: missions } = await supabase
+  const { data: missions } = company ? await supabase
     .from("bookings")
     .select("*, cars(brand, model), customer:profiles!bookings_customer_id_fkey(full_name)")
     .eq("company_id", company.id)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false }) : { data: [] };
 
   const missionsList = missions || [];
 
