@@ -158,6 +158,7 @@ export async function submitReview(bookingId: string, companyId: string, carId: 
         booking_id: bookingId,
         company_id: companyId,
         car_id: carId,
+        customer_id: user.sub,
         rating,
         comment,
       });
