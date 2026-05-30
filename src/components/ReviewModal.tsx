@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,8 +22,13 @@ export default function ReviewModal({ isOpen, onClose, bookingId, companyId, car
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,8 +54,8 @@ export default function ReviewModal({ isOpen, onClose, bookingId, companyId, car
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
       <div className="bg-[#121217] border border-zinc-800/80 w-full max-w-md rounded-2xl p-6 relative shadow-2xl shadow-emerald-900/20">
         <button
           onClick={onClose}
@@ -108,6 +114,7 @@ export default function ReviewModal({ isOpen, onClose, bookingId, companyId, car
           </Button>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
