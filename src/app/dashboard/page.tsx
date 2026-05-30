@@ -574,26 +574,57 @@ export default async function DashboardPage() {
   }
 
   // ==========================================
-  // CLIENT FALLBACK WITH ELITE UI
+  // CLIENT DASHBOARD (ELITE MOBILITY DESIGN)
   // ==========================================
+  const [
+    { data: myBookings },
+    { data: allMyBookings }
+  ] = await Promise.all([
+    supabase
+      .from("bookings")
+      .select("*, cars(brand, model)")
+      .eq("customer_id", user.sub)
+      .order("created_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("bookings")
+      .select("total_price, status")
+      .eq("customer_id", user.sub)
+  ]);
+
+  const totalSpent = (allMyBookings || [])
+    .filter(b => b.status === "completed")
+    .reduce((acc, b) => acc + (b.total_price || 0), 0);
+
+  const activeBookingsCount = (allMyBookings || []).filter(b => ["pending", "confirmed", "active", "en_route"].includes(b.status)).length;
+  const completedBookingsCount = (allMyBookings || []).filter(b => b.status === "completed").length;
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[#0a0a0f] text-zinc-50 font-sans pt-14">
       <aside className="w-full md:w-64 border-r border-zinc-800/50 bg-[#0f0f13] hidden md:flex md:flex-col pt-8 pb-6">
-        <div className="px-6 mb-10">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 border border-white rounded flex items-center justify-center font-bold text-xs">W</div>
-            <div>
-              <h1 className="font-bold text-sm tracking-wide">Espace {role === 'super_admin' ? 'Admin' : 'Client'}</h1>
-              <p className="text-[9px] uppercase tracking-widest text-zinc-500">Elite Mobility Service</p>
+        <div className="px-4 mb-8">
+          <div className="flex items-center gap-4 bg-zinc-900/50 border border-zinc-800/80 p-3 rounded-2xl">
+            <div className="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center font-black text-white text-lg shrink-0">
+              {displayName.substring(0, 2).toUpperCase()}
             </div>
-          </Link>
+            <div className="overflow-hidden">
+              <h3 className="font-bold text-white text-base truncate">{displayName}</h3>
+              <p className="text-emerald-400 text-sm font-medium">Client</p>
+            </div>
+          </div>
         </div>
-        <nav className="flex-1 px-4 space-y-1">
-          <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-800/60 text-white font-medium text-sm">
-            <TrendingUp className="w-4 h-4" /> Vue d'ensemble
+        <nav className="flex-1 px-4 space-y-2">
+          <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/50 font-medium text-sm transition-colors">
+            <TrendingUp className="w-5 h-5" /> Vue d'ensemble
+          </Link>
+          <Link href="/dashboard/bookings" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium text-sm transition-colors">
+            <Calendar className="w-5 h-5" /> Réservations
+          </Link>
+          <Link href="/dashboard/revenues" className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/50 font-medium text-sm transition-colors">
+            <Wallet className="w-5 h-5" /> Revenus
           </Link>
           <Link href="/dashboard/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900/50 font-medium text-sm transition-colors">
-            <Settings className="w-4 h-4" /> Paramètres
+            <Settings className="w-5 h-5" /> Paramètres
           </Link>
         </nav>
         <div className="px-4 space-y-1 mt-auto">
@@ -605,10 +636,110 @@ export default async function DashboardPage() {
         </div>
       </aside>
 
-      <main className="flex-1 p-6 md:p-10 overflow-y-auto">
-        <DashboardRealtimeListener role={role as any} ownerId={user.sub} />
-        <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Bonjour, {displayName.split(" ")[0]} 👋</h1>
-        <p className="text-zinc-500 text-sm mb-10">Interface mise à jour ({role}).</p>
+      <main className="flex-1 p-6 md:p-10 overflow-y-auto space-y-8">
+        <DashboardRealtimeListener role="client" ownerId={user.sub} />
+        
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Bonjour, {displayName.split(" ")[0]} 👋</h1>
+            <p className="text-zinc-500 text-sm">Gérez vos réservations et suivez votre activité.</p>
+          </div>
+          <Link href="/cars">
+            <Button className="bg-white hover:bg-zinc-200 text-black font-bold rounded-full shadow-[0_0_20px_rgba(255,255,255,0.1)] px-6">
+              <Car className="w-4 h-4 mr-2" />
+              Réserver un véhicule
+            </Button>
+          </Link>
+        </div>
+
+        {/* KPIs */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="bg-[#121217] border-zinc-800/60 rounded-2xl relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <CardContent className="p-6">
+              <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mb-4">
+                <Calendar className="w-5 h-5 text-blue-400" />
+              </div>
+              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Réservations Actives</p>
+              <h3 className="text-4xl font-black text-white">{activeBookingsCount}</h3>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-[#121217] border-zinc-800/60 rounded-2xl">
+            <CardContent className="p-6">
+              <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center mb-4">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+              </div>
+              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Voyages Terminés</p>
+              <h3 className="text-4xl font-black text-white">{completedBookingsCount}</h3>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-[#121217] border-zinc-800/60 rounded-2xl">
+            <CardContent className="p-6">
+              <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center mb-4">
+                <Wallet className="w-5 h-5 text-purple-400" />
+              </div>
+              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Total Dépensé</p>
+              <h3 className="text-4xl font-black text-white">{totalSpent} €</h3>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Bookings List */}
+        <div className="grid grid-cols-1 gap-6">
+          <Card className="bg-[#121217] border-zinc-800/60 rounded-2xl">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-zinc-800/60 pb-4">
+              <CardTitle className="text-white text-lg">Dernières Réservations</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {!myBookings || myBookings.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 rounded-full bg-zinc-900 flex items-center justify-center mx-auto mb-4">
+                    <Car className="w-6 h-6 text-zinc-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">Aucune réservation</h3>
+                  <p className="text-zinc-500 text-sm mb-6 max-w-sm mx-auto">Vous n'avez pas encore effectué de réservation. Explorez notre flotte d'élite pour votre prochain voyage.</p>
+                  <Link href="/cars">
+                    <Button className="bg-blue-600 hover:bg-blue-500 text-white rounded-full">
+                      Voir les véhicules
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {myBookings.map((b) => (
+                    <div key={b.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-xl bg-zinc-900/40 border border-zinc-800/40 hover:border-zinc-700 transition-colors gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center shrink-0">
+                          <CarFront className="w-6 h-6 text-zinc-400" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-white text-base">{(b.cars as any)?.brand} {(b.cars as any)?.model}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs text-zinc-500 font-mono">{b.id.split('-')[0]}</span>
+                            <span className="text-zinc-700">•</span>
+                            <span className="text-xs text-zinc-400 font-medium">{b.total_price} €</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4">
+                        <div className="text-right">
+                          <p className="text-xs text-zinc-500">Du {new Date(b.start_date).toLocaleDateString('fr-FR')}</p>
+                          <p className="text-xs text-zinc-500">Au {new Date(b.end_date).toLocaleDateString('fr-FR')}</p>
+                        </div>
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-wider border ${STATUS_STYLES[b.status] || STATUS_STYLES.completed}`}>
+                          {STATUS_LABELS[b.status] || b.status.toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </main>
     </div>
   );
