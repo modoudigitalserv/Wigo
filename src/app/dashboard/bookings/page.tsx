@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CarFront, Calendar, Wallet, TrendingUp, Settings, UserRound, ArrowLeft, MapPin, Clock, ChevronRight, Building2, Users } from "lucide-react";
+import { CarFront, Calendar, Wallet, TrendingUp, Settings, UserRound, ArrowLeft, MapPin, Clock, ChevronRight, Building2, Users, Star } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/server";
 import { redirect } from "next/navigation";
@@ -52,7 +52,7 @@ export default async function BookingsPage() {
   // Fetch all bookings for this user with car info
   const { data: bookings } = await supabase
     .from("bookings")
-    .select("*, cars(brand, model, city), reviews(id)")
+    .select("*, cars(brand, model, city), reviews(*)")
     .eq("customer_id", user.sub)
     .order("created_at", { ascending: false });
 
@@ -68,7 +68,7 @@ export default async function BookingsPage() {
     if (company) {
       const { data: cBookings } = await supabase
         .from("bookings")
-        .select("*, cars(brand, model, city), profiles!bookings_customer_id_fkey(full_name, email), reviews(id)")
+        .select("*, cars(brand, model, city), profiles!bookings_customer_id_fkey(full_name, email), reviews(*)")
         .eq("company_id", company.id)
         .order("created_at", { ascending: false });
       companyBookings = cBookings;
@@ -313,7 +313,9 @@ export default async function BookingsPage() {
                           <p className="text-xs text-zinc-500">Total</p>
                         </div>
                         {role === "company" || role === "super_admin" ? (
-                          <BookingStatusDropdown bookingId={booking.id} initialStatus={booking.status} />
+                          <div className="flex flex-col items-end gap-2">
+                            <BookingStatusDropdown bookingId={booking.id} initialStatus={booking.status} />
+                          </div>
                         ) : (
                           <div className="flex flex-col items-end gap-2">
                             <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${statusStyle}`}>
@@ -337,6 +339,30 @@ export default async function BookingsPage() {
                         )}
                       </div>
                     </div>
+                    
+                    {/* Review Display for Company */}
+                    {(role === "company" || role === "super_admin") && (booking as any).reviews?.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-zinc-800/50">
+                        <div className="bg-zinc-900/30 rounded-xl p-4 border border-zinc-800/30">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="flex">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`w-4 h-4 ${(booking as any).reviews[0].rating >= star ? "fill-yellow-500 text-yellow-500" : "text-zinc-700"}`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-xs text-zinc-500 font-medium">Avis du client</span>
+                          </div>
+                          {(booking as any).reviews[0].comment ? (
+                            <p className="text-sm text-zinc-300 italic">"{(booking as any).reviews[0].comment}"</p>
+                          ) : (
+                            <p className="text-sm text-zinc-500 italic">Aucun commentaire laissé.</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               );
