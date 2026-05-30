@@ -141,3 +141,33 @@ export async function updateDriverBookingStatus(bookingId: string, status: strin
   revalidatePath("/dashboard/revenues");
   revalidatePath("/dashboard");
 }
+
+export async function submitReview(bookingId: string, companyId: string, carId: string, rating: number, comment: string) {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims;
+  if (!user) return { error: "Unauthorized" };
+
+  try {
+    const { error } = await supabase
+      .from("reviews")
+      .insert({
+        booking_id: bookingId,
+        company_id: companyId,
+        car_id: carId,
+        rating,
+        comment,
+      });
+
+    if (error) {
+      console.error("Review insertion error:", error);
+      return { error: "Impossible de publier l'avis. Avez-vous déjà évalué cette réservation ?" };
+    }
+
+    revalidatePath("/dashboard/bookings");
+    return { success: true };
+  } catch (err: any) {
+    console.error("Review error:", err);
+    return { error: "Une erreur est survenue." };
+  }
+}

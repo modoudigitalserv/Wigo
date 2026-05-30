@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/server";
 import { redirect } from "next/navigation";
 import BookingStatusDropdown from "@/components/BookingStatusDropdown";
+import ReviewButton from "@/components/ReviewButton";
 
 const STATUS_STYLES: Record<string, string> = {
   confirmed: "text-green-400 bg-green-400/10 border-green-400/20",
@@ -51,7 +52,7 @@ export default async function BookingsPage() {
   // Fetch all bookings for this user with car info
   const { data: bookings } = await supabase
     .from("bookings")
-    .select("*, cars(brand, model, city)")
+    .select("*, cars(brand, model, city), reviews(id)")
     .eq("customer_id", user.sub)
     .order("created_at", { ascending: false });
 
@@ -67,7 +68,7 @@ export default async function BookingsPage() {
     if (company) {
       const { data: cBookings } = await supabase
         .from("bookings")
-        .select("*, cars(brand, model, city), profiles!bookings_customer_id_fkey(full_name, email)")
+        .select("*, cars(brand, model, city), profiles!bookings_customer_id_fkey(full_name, email), reviews(id)")
         .eq("company_id", company.id)
         .order("created_at", { ascending: false });
       companyBookings = cBookings;
@@ -314,9 +315,25 @@ export default async function BookingsPage() {
                         {role === "company" || role === "super_admin" ? (
                           <BookingStatusDropdown bookingId={booking.id} initialStatus={booking.status} />
                         ) : (
-                          <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${statusStyle}`}>
-                            {statusLabel}
-                          </span>
+                          <div className="flex flex-col items-end gap-2">
+                            <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${statusStyle}`}>
+                              {statusLabel}
+                            </span>
+                            {role === "client" && status === "completed" && (
+                              (booking as any).reviews?.length > 0 ? (
+                                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">
+                                  ✅ Évalué
+                                </span>
+                              ) : (
+                                <ReviewButton
+                                  bookingId={booking.id}
+                                  companyId={booking.company_id}
+                                  carId={booking.car_id}
+                                  carName={carName}
+                                />
+                              )
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>
