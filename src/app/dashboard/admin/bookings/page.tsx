@@ -60,13 +60,13 @@ export default async function AdminBookingsPage() {
                     {booking.id.split("-")[0]}
                   </td>
                   <td className="px-6 py-4">
-                    <p className="font-medium text-white">{booking.profiles?.full_name || "Sans nom"}</p>
-                    <p className="text-xs text-zinc-500">{booking.profiles?.email}</p>
+                    <p className="font-medium text-white">{(booking.profiles as any)?.full_name || "Sans nom"}</p>
+                    <p className="text-xs text-zinc-500">{(booking.profiles as any)?.email}</p>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <Car className="w-4 h-4 text-zinc-500" />
-                      <span className="text-zinc-300 font-medium">{booking.cars?.brand} {booking.cars?.model}</span>
+                      <span className="text-zinc-300 font-medium">{(booking.cars as any)?.brand} {(booking.cars as any)?.model}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-zinc-400 text-xs">

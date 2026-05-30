@@ -132,7 +132,7 @@ export default async function AdminOverviewPage() {
                            <Car className="w-5 h-5 text-zinc-400" />
                          </div>
                          <div>
-                           <p className="text-sm font-bold text-white">{b.cars?.brand} {b.cars?.model}</p>
+                           <p className="text-sm font-bold text-white">{(b.cars as any)?.brand} {(b.cars as any)?.model}</p>
                            <p className="text-xs text-zinc-500">{new Date(b.created_at).toLocaleDateString('fr-FR')} • {b.total_price}€</p>
                          </div>
                        </div>
