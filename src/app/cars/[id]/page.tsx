@@ -230,8 +230,9 @@ export default async function CarDetailPage(props: Props) {
                         <input 
                           type="date" 
                           name="start_date" 
-                          required 
-                          className="w-full bg-[#0a0a0f] border border-zinc-800 rounded-xl py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                          required
+                          min={new Date().toISOString().split('T')[0]}
+                          className="w-full bg-[#0a0a0f] border border-zinc-800 rounded-xl py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-blue-500 outline-none [color-scheme:dark]"
                         />
                       </div>
                     </div>
@@ -242,8 +243,9 @@ export default async function CarDetailPage(props: Props) {
                         <input 
                           type="date" 
                           name="end_date" 
-                          required 
-                          className="w-full bg-[#0a0a0f] border border-zinc-800 rounded-xl py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                          required
+                          min={new Date().toISOString().split('T')[0]}
+                          className="w-full bg-[#0a0a0f] border border-zinc-800 rounded-xl py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-blue-500 outline-none [color-scheme:dark]"
                         />
                       </div>
                     </div>

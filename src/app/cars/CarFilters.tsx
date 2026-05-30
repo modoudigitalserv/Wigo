@@ -4,10 +4,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { X, Headset } from "lucide-react";
 import { useState, useCallback } from "react";
 
-const BRANDS = ["Tesla", "BMW", "Mercedes", "Audi"];
-const TYPES = ["Berline de Luxe", "SUV Premium", "Sportive"];
+const BRANDS = ["Dacia", "Renault", "Peugeot", "Hyundai", "Volkswagen", "Mercedes", "Range Rover"];
+const TYPES = ["Citadine", "Berline", "SUV", "Premium", "Sportive"];
 const TRANSMISSIONS = ["Manuelle", "Automatique"];
-const MAX_PRICE = 800;
+const MAX_PRICE = 2000;
 const MIN_PRICE = 150;
 
 export default function CarFilters() {
@@ -138,30 +138,6 @@ export default function CarFilters() {
         />
       </div>
 
-      {/* Type de Véhicule */}
-      <div className="space-y-3">
-        <h3 className="font-semibold text-zinc-500 uppercase text-[10px] tracking-widest">Type de Véhicule</h3>
-        <div className="space-y-2">
-          {TYPES.map(type => {
-            const isActive = selectedType === type;
-            return (
-              <label key={type} className="flex items-center gap-3 cursor-pointer group">
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                  isActive ? "border-blue-500" : "border-zinc-700 group-hover:border-zinc-500"
-                }`}>
-                  {isActive && <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />}
-                </div>
-                <span
-                  className={`text-sm transition-colors ${isActive ? "text-white font-medium" : "text-zinc-400 group-hover:text-white"}`}
-                  onClick={() => handleTypeChange(type)}
-                >
-                  {type}
-                </span>
-              </label>
-            );
-          })}
-        </div>
-      </div>
 
       {/* Transmission */}
       <div className="space-y-3">

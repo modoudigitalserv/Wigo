@@ -77,17 +77,21 @@ export default async function CarsPage(props: Props) {
             <div className="flex items-center gap-2 mt-4 mb-3">
               <div className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-zinc-900/80 border border-zinc-800 flex-1 max-w-md">
                 <MapPin className="w-4 h-4 text-blue-400" />
-                <input
-                  type="text"
-                  placeholder="Paris, France"
-                  className="bg-transparent border-none outline-none text-sm text-white placeholder-zinc-500 w-full"
-                />
+                <select defaultValue="" className="bg-transparent border-none outline-none text-sm text-white placeholder-zinc-500 w-full appearance-none cursor-pointer">
+                  <option value="" disabled className="text-zinc-500">Ville, Pays</option>
+                  <option value="Casablanca, Maroc" className="text-black">Casablanca, Maroc</option>
+                  <option value="Rabat, Maroc" className="text-black">Rabat, Maroc</option>
+                  <option value="Marrakech, Maroc" className="text-black">Marrakech, Maroc</option>
+                  <option value="Tanger, Maroc" className="text-black">Tanger, Maroc</option>
+                  <option value="Agadir, Maroc" className="text-black">Agadir, Maroc</option>
+                  <option value="Fès, Maroc" className="text-black">Fès, Maroc</option>
+                </select>
                 <div className="w-px h-5 bg-zinc-700" />
                 <Calendar className="w-4 h-4 text-zinc-500" />
                 <input
-                  type="text"
-                  placeholder="Date"
-                  className="bg-transparent border-none outline-none text-sm text-white placeholder-zinc-500 w-24"
+                  type="date"
+                  min={new Date().toISOString().split('T')[0]}
+                  className="bg-transparent border-none outline-none text-sm text-white placeholder-zinc-500 w-[110px] [color-scheme:dark]"
                 />
               </div>
               <button className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-500 flex items-center justify-center transition-colors shadow-lg shadow-blue-600/20">

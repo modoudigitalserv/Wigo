@@ -127,7 +127,15 @@ export default function LandingClient({ cars }: { cars: any[] }) {
               <MapPin className="w-5 h-5 text-blue-500 shrink-0" />
               <div className="text-left w-full">
                 <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-0.5">Lieu</p>
-                <input type="text" placeholder="Paris, France" className="bg-transparent border-none outline-none text-white w-full placeholder-zinc-700 font-semibold text-sm" />
+                <select defaultValue="" className="bg-transparent border-none outline-none text-white w-full placeholder-zinc-700 font-semibold text-sm appearance-none cursor-pointer">
+                  <option value="" disabled className="text-zinc-500">Ville, Pays</option>
+                  <option value="Casablanca, Maroc" className="text-black">Casablanca, Maroc</option>
+                  <option value="Rabat, Maroc" className="text-black">Rabat, Maroc</option>
+                  <option value="Marrakech, Maroc" className="text-black">Marrakech, Maroc</option>
+                  <option value="Tanger, Maroc" className="text-black">Tanger, Maroc</option>
+                  <option value="Agadir, Maroc" className="text-black">Agadir, Maroc</option>
+                  <option value="Fès, Maroc" className="text-black">Fès, Maroc</option>
+                </select>
               </div>
             </div>
             
@@ -135,7 +143,7 @@ export default function LandingClient({ cars }: { cars: any[] }) {
               <Calendar className="w-5 h-5 text-blue-500 shrink-0" />
               <div className="text-left w-full">
                 <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-0.5">Date</p>
-                <input type="text" placeholder="mm/dd/yyyy" className="bg-transparent border-none outline-none text-white w-full placeholder-zinc-700 font-semibold text-sm" />
+                <input type="date" min={new Date().toISOString().split('T')[0]} className="bg-transparent border-none outline-none text-white w-full placeholder-zinc-700 font-semibold text-sm [color-scheme:dark]" />
               </div>
             </div>
 
@@ -148,9 +156,9 @@ export default function LandingClient({ cars }: { cars: any[] }) {
                   onChange={(e) => setSelectedService(e.target.value)} 
                   className="bg-transparent border-none outline-none text-white w-full font-semibold text-sm appearance-none cursor-pointer"
                 >
-                  <option value="Chauffeur Privé">Chauffeur Privé</option>
-                  <option value="Voiture Seule">Voiture Seule</option>
-                  <option value="Voiture + Chauffeur">Voiture + Chauffeur</option>
+                  <option value="Chauffeur Privé" className="text-black">Chauffeur Privé</option>
+                  <option value="Voiture Seule" className="text-black">Voiture Seule</option>
+                  <option value="Voiture + Chauffeur" className="text-black">Voiture + Chauffeur</option>
                 </select>
               </div>
             </div>
