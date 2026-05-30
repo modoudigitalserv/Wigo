@@ -142,6 +142,9 @@ export async function updateDriverBookingStatus(bookingId: string, status: strin
   revalidatePath("/dashboard");
 }
 
+import fs from "fs";
+import path from "path";
+
 export async function submitReview(bookingId: string, companyId: string, carId: string, rating: number, comment: string) {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
@@ -161,13 +164,19 @@ export async function submitReview(bookingId: string, companyId: string, carId: 
 
     if (error) {
       console.error("Review insertion error:", error);
-      return { error: "Impossible de publier l'avis. Avez-vous déjà évalué cette réservation ?" };
+      try {
+        fs.writeFileSync(path.join(process.cwd(), "scratch", "last_review_error.txt"), JSON.stringify(error, null, 2));
+      } catch (e) {}
+      return { error: error.message || "Erreur de base de données" };
     }
 
     revalidatePath("/dashboard/bookings");
     return { success: true };
   } catch (err: any) {
     console.error("Review error:", err);
-    return { error: "Une erreur est survenue." };
+    try {
+      fs.writeFileSync(path.join(process.cwd(), "scratch", "last_review_error.txt"), String(err.message || err));
+    } catch (e) {}
+    return { error: err.message || "Une erreur est survenue." };
   }
 }
