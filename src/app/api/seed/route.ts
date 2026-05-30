@@ -10,6 +10,15 @@ export async function GET() {
   }
 
   // 1. Insert company if not exists
+  const { error: profileError } = await supabase.from("profiles").upsert({
+    id: user.id,
+    role: "company",
+    full_name: "Test Company",
+  });
+  if (profileError) {
+    console.error("Erreur upsert profile:", profileError);
+  }
+
   let { data: company } = await supabase
     .from("companies")
     .select("*")

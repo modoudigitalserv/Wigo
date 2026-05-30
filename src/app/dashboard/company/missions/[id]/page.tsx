@@ -23,24 +23,38 @@ const STATUS_LABELS: Record<string, string> = {
   pending: "EN ATTENTE",
 };
 
-export default async function MissionDetailsPage({ params }: { params: { id: string } }) {
+export default async function MissionDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
   if (!user) redirect("/login");
 
-  const { data: company } = await supabase
+  const { data: companies } = await supabase
     .from("companies")
     .select("id")
-    .eq("user_id", user.sub)
-    .maybeSingle();
+    .eq("user_id", user.sub);
 
-  const { data: mission } = company ? await supabase
+  const companyIds = companies?.map(c => c.id) || [];
+
+  const { data: mission } = companyIds.length > 0 ? await supabase
     .from("bookings")
-    .select("*, cars(*, car_images(image_url)), customer:profiles!bookings_customer_id_fkey(full_name, phone)")
-    .eq("id", params.id)
-    .eq("company_id", company.id)
+    .select("*, cars(*, car_images(image_url))")
+    .eq("id", id)
+    .in("company_id", companyIds)
     .maybeSingle() : { data: null };
+
+  let customerEmail = "";
+  if (mission?.customer_id) {
+    const { data: userData } = await supabase
+      .from("profiles")
+      .select("email")
+      .eq("id", mission.customer_id)
+      .maybeSingle();
+    if (userData?.email) {
+      customerEmail = userData.email;
+    }
+  }
 
   if (!mission) {
     return (
@@ -139,7 +153,7 @@ export default async function MissionDetailsPage({ params }: { params: { id: str
                   <User className="w-6 h-6 text-zinc-400" />
                 </div>
                 <div>
-                  <p className="font-bold text-white">{mission.customer?.full_name || "Client Inconnu"}</p>
+                  <p className="font-bold text-white">{customerEmail || "Client Inconnu"}</p>
                   <p className="text-xs text-zinc-500">Locataire</p>
                 </div>
               </div>

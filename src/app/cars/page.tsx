@@ -56,7 +56,7 @@ export default async function CarsPage(props: Props) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#0a0a0f] text-zinc-50 font-sans pb-24 md:pb-0 pt-6">
+    <div className="flex flex-col min-h-screen bg-[#0a0a0f] text-zinc-50 font-sans pb-24 md:pb-0 pt-28">
       <div className="container mx-auto px-4 max-w-7xl flex flex-col md:flex-row gap-10">
         
         {/* Sidebar */}
@@ -117,7 +117,7 @@ export default async function CarsPage(props: Props) {
                       alt={name}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-700"
-                      unoptimized
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                     {/* Verified badge */}
                     <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/90 backdrop-blur-sm">

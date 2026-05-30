@@ -87,10 +87,10 @@ export default async function CompanyDashboardLayout({ children }: { children: R
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
           <div className="flex items-center gap-4">
             {/* Le titre h1 sera géré par la page enfant, ici on met juste le statut */}
-            <span className="px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] font-bold tracking-widest text-emerald-400 flex items-center gap-1.5 uppercase">
+            <div className="px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] font-bold tracking-widest text-emerald-400 flex items-center gap-1.5 uppercase">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Système en ligne
-            </span>
+            </div>
           </div>
           
           <div className="flex items-center gap-6">

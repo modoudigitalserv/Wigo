@@ -85,7 +85,7 @@ export default function LandingClient({ cars }: { cars: any[] }) {
             fill
             className="object-cover object-center opacity-30 mix-blend-screen"
             priority
-            unoptimized
+            sizes="100vw"
           />
           {/* Neon vertical highlights simulation */}
           <div className="absolute inset-y-0 left-1/4 w-[1px] bg-gradient-to-b from-transparent via-blue-500/20 to-transparent blur-[2px]" />
@@ -204,7 +204,7 @@ export default function LandingClient({ cars }: { cars: any[] }) {
                 alt={featuredCars[0].brand}
                 fill
                 className="object-cover opacity-70 group-hover:scale-105 transition-transform duration-700 ease-out"
-                unoptimized
+                sizes="(max-width: 1024px) 100vw, 66vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#070708] via-[#070708]/30 to-transparent" />
               
@@ -238,7 +238,7 @@ export default function LandingClient({ cars }: { cars: any[] }) {
                     alt={car.brand}
                     fill
                     className="object-cover opacity-70 group-hover:scale-105 transition-transform duration-700 ease-out"
-                    unoptimized
+                    sizes="(max-width: 1024px) 100vw, 33vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#070708] via-[#070708]/30 to-transparent" />
                   
@@ -270,7 +270,7 @@ export default function LandingClient({ cars }: { cars: any[] }) {
                   alt={driver.name}
                   fill
                   className="object-cover rounded-full border border-zinc-800"
-                  unoptimized
+                  sizes="96px"
                 />
                 <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-blue-600 border-2 border-[#0c0c0e] flex items-center justify-center shadow-lg">
                   <ShieldCheck className="w-3.5 h-3.5 text-white" />
@@ -314,7 +314,7 @@ export default function LandingClient({ cars }: { cars: any[] }) {
             return (
               <Card key={car.id} className="overflow-hidden rounded-3xl bg-zinc-950/90 border border-zinc-800/60 hover:border-blue-500/40 transition-all duration-300">
                 <div className="relative h-48 bg-zinc-900">
-                  <Image src={primaryImage} alt={name} fill className="object-cover" unoptimized />
+                  <Image src={primaryImage} alt={name} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 33vw" />
                 </div>
                 <CardContent className="p-5">
                   <div className="flex items-center justify-between gap-4 mb-3">
@@ -453,7 +453,7 @@ export default function LandingClient({ cars }: { cars: any[] }) {
               alt="Porsche Silhouette"
               fill
               className="object-cover"
-              unoptimized
+              sizes="100vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0c] via-transparent to-[#0a0a0c]" />
           </div>

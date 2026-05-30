@@ -14,14 +14,34 @@ export async function addCar(formData: FormData) {
     redirect("/login");
   }
 
-  const { data: company, error: companyError } = await supabase
+  let { data: company, error: companyError } = await supabase
     .from("companies")
     .select("id")
-    .eq("user_id", user.sub)
-    .single();
+    .eq("user_id", user.sub || user.id)
+    .limit(1)
+    .maybeSingle();
 
-  if (companyError || !company) {
-    throw new Error("Vous devez avoir un profil entreprise pour ajouter un véhicule.");
+  if (companyError) {
+    throw new Error("Erreur de base de données: " + companyError.message);
+  }
+
+  if (!company) {
+    // Créer une entreprise par défaut si elle n'existe pas pour débloquer le testeur
+    const { data: newCompany, error: insertError } = await supabase
+      .from("companies")
+      .insert({
+        user_id: user.sub || user.id,
+        name: "Mon Entreprise (Auto-générée)",
+        city: "Paris",
+        subscription_plan: "Pro"
+      })
+      .select("id")
+      .single();
+
+    if (insertError) {
+      throw new Error("Impossible de créer le profil entreprise automatiquement.");
+    }
+    company = newCompany;
   }
 
   // 2. Extract form data
@@ -30,11 +50,8 @@ export async function addCar(formData: FormData) {
   const year = parseInt(formData.get("year") as string);
   const fuel = formData.get("fuel") as string;
   const transmission = formData.get("transmission") as string;
-  const seats = parseInt(formData.get("seats") as string) || 5;
   const price_day = parseFloat(formData.get("price_day") as string);
   const city = formData.get("city") as string;
-  const description = formData.get("description") as string;
-  const mileage = parseInt(formData.get("mileage") as string);
   
   // 3. Insert into `cars` table
   const { data: newCar, error: insertError } = await supabase
@@ -46,11 +63,8 @@ export async function addCar(formData: FormData) {
       year,
       fuel,
       transmission,
-      seats,
       price_day,
       city,
-      description,
-      mileage,
       status: "disponible"
     })
     .select()

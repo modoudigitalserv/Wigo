@@ -567,7 +567,14 @@ export default async function DashboardPage() {
   }
 
   // ==========================================
-  // SUPER ADMIN & CLIENT FALLBACK WITH ELITE UI
+  // SUPER ADMIN DASHBOARD REDIRECT
+  // ==========================================
+  if (role === "super_admin") {
+    redirect("/dashboard/admin");
+  }
+
+  // ==========================================
+  // CLIENT FALLBACK WITH ELITE UI
   // ==========================================
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[#0a0a0f] text-zinc-50 font-sans pt-14">

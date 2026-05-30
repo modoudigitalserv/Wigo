@@ -1,8 +1,8 @@
-import { createClient } from "@/lib/server";
+import { createPublicClient } from "@/lib/public-client";
 import LandingClient from "./LandingClient";
 
 export default async function Home() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const { data: dbCars } = await supabase
     .from("cars")

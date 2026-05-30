@@ -27,19 +27,43 @@ export default async function CompanyMissionsPage() {
   const user = data?.claims;
   if (!user) redirect("/login");
 
-  const { data: company } = await supabase
+  const { data: companies } = await supabase
     .from("companies")
     .select("id")
-    .eq("user_id", user.sub)
-    .maybeSingle();
+    .eq("user_id", user.sub);
 
-  const { data: missions } = company ? await supabase
+  const companyIds = companies?.map(c => c.id) || [];
+  
+  console.log("DEBUG: User ID:", user.sub);
+  console.log("DEBUG: Found companies:", companyIds);
+
+  const { data: missions, error: missionsError } = companyIds.length > 0 ? await supabase
     .from("bookings")
-    .select("*, cars(brand, model), customer:profiles!bookings_customer_id_fkey(full_name)")
-    .eq("company_id", company.id)
-    .order("created_at", { ascending: false }) : { data: [] };
+    .select("*, cars(brand, model)")
+    .in("company_id", companyIds)
+    .order("created_at", { ascending: false }) : { data: [], error: null };
+
+  if (missionsError) console.error("DEBUG MISSIONS ERROR:", missionsError);
 
   const missionsList = missions || [];
+
+  // Fetch emails safely
+  const customerIds = [...new Set(missionsList.map(m => m.customer_id).filter(Boolean))];
+  let usersMap: Record<string, string> = {};
+  if (customerIds.length > 0) {
+    const { data: usersData, error: usersError } = await supabase
+      .from("profiles")
+      .select("id, email")
+      .in("id", customerIds);
+    
+    console.log("DEBUG USERS FETCHED:", usersData?.length, "Error:", usersError);
+
+    if (!usersError && usersData) {
+      usersData.forEach(u => {
+        usersMap[u.id] = u.email;
+      });
+    }
+  }
 
   const planned = missionsList.filter(m => m.status === "confirmed").length;
   const inProgress = missionsList.filter(m => m.status === "active" || m.status === "en_route").length;
@@ -67,9 +91,11 @@ export default async function CompanyMissionsPage() {
         </Card>
         <Card className="bg-[#121217] border-zinc-800/60 rounded-2xl">
           <CardContent className="p-6">
-            <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">En cours</p>
-            <p className="mt-4 text-3xl font-extrabold text-white">{inProgress}</p>
-            <p className="mt-2 text-xs text-emerald-500 flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"/> Actives actuellement</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">En cours</p>
+              <p className="mt-4 text-4xl font-extrabold text-white">{inProgress}</p>
+              <div className="mt-2 text-xs text-emerald-500 flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Actuellement sur la route
+              </div>
           </CardContent>
         </Card>
         <Card className="bg-[#121217] border-zinc-800/60 rounded-2xl">
@@ -112,7 +138,7 @@ export default async function CompanyMissionsPage() {
                   missionsList.map((m) => (
                     <tr key={m.id} className="border-b border-zinc-800/50 hover:bg-zinc-900/30 transition-colors">
                       <td className="px-4 py-4 text-zinc-400 font-mono text-xs">#{m.id.split("-")[0]}</td>
-                      <td className="px-4 py-4 text-white font-medium">{m.customer?.full_name || "Client Inconnu"}</td>
+                      <td className="px-4 py-4 text-white font-medium">{usersMap[m.customer_id] || "Client Inconnu"}</td>
                       <td className="px-4 py-4 text-zinc-300">
                         {m.cars?.brand} {m.cars?.model}
                       </td>

@@ -42,5 +42,6 @@ export async function createBooking(formData: FormData) {
   }
 
   revalidatePath("/dashboard/bookings");
+  revalidatePath("/dashboard/company/missions");
   redirect("/dashboard/bookings");
 }
