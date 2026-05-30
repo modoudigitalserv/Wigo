@@ -140,13 +140,13 @@ export default async function SettingsPage() {
       {/* Sidebar */}
       <aside className="w-full md:w-64 border-r border-zinc-800 bg-zinc-950/50 hidden md:flex md:flex-col">
         <div className="p-6 flex-1">
-          <div className="flex items-center gap-3 mb-8 p-3 rounded-xl bg-zinc-900/50 border border-zinc-800/50">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 ${theme.bg}`}>
+          <div className="flex items-center gap-4 bg-zinc-900/50 border border-zinc-800/80 p-3 rounded-2xl mb-8">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-lg shrink-0 ${theme.bg}`}>
               {initials}
             </div>
-            <div className="min-w-0">
-              <p className="font-bold text-sm truncate">{displayName}</p>
-              <p className={`text-xs capitalize ${theme.text}`}>{role === 'super_admin' ? 'Super Admin' : role}</p>
+            <div className="overflow-hidden">
+              <h3 className="font-bold text-white text-base truncate">{displayName}</h3>
+              <p className={`text-sm font-medium capitalize ${theme.text}`}>{role === 'super_admin' ? 'Super Admin' : role}</p>
             </div>
           </div>
           <nav className="space-y-1">
