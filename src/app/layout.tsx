@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Wigo - SaaS de Mobilité",
-  description: "Plateforme premium de location de voitures et de réservation de chauffeurs.",
+  title: "Wigo | Votre Partenaire Mobilité Premium",
+  description: "Bienvenue sur Wigo, la plateforme premium de location de voitures de prestige et de réservation de chauffeurs professionnels.",
 };
 
 export default function RootLayout({

@@ -25,10 +25,11 @@ export default async function Header() {
         
         {/* Left: Logo + Nav */}
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center text-white font-extrabold text-xs shadow-[0_0_12px_rgba(37,99,235,0.5)]">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-extrabold text-sm shadow-[0_0_15px_rgba(37,99,235,0.6)] group-hover:shadow-[0_0_20px_rgba(37,99,235,0.8)] transition-all">
               W
             </div>
+            <span className="text-xl font-black tracking-tight text-white group-hover:text-blue-400 transition-colors">Wigo</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">

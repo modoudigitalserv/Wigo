@@ -101,10 +101,9 @@ export default function LandingClient({ cars }: { cars: any[] }) {
             transition={{ duration: 0.8 }}
             className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight text-white"
           >
+            Bienvenue sur <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]">Wigo</span><br />
             L&apos;Excellence du Voyage,<br />
-            <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent">
-              Redéfinie.
-            </span>
+            Redéfinie.
           </motion.h1>
 
           <motion.p 
@@ -113,7 +112,7 @@ export default function LandingClient({ cars }: { cars: any[] }) {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-zinc-400 text-sm sm:text-base md:text-lg max-w-xl mb-12 leading-relaxed"
           >
-            Accédez à une flotte exclusive de véhicules de prestige et des chauffeurs d&apos;exception pour vos déplacements les plus exigeants.
+            Avec <strong className="text-white">Wigo</strong>, accédez à une flotte exclusive de véhicules de prestige et des chauffeurs d&apos;exception pour vos déplacements les plus exigeants.
           </motion.p>
 
           {/* Floating Search Bar */}
